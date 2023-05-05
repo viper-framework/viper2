@@ -76,7 +76,7 @@ class Shell:
                 continue
 
             if cmd_name in self.__commands.keys():
-                cmd = self.__commands[cmd_name]["instance"]
+                cmd = self.__commands[cmd_name]["class"]()
                 cmd.run(*cmd_args)
                 continue
 

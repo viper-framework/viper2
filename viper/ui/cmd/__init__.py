@@ -7,19 +7,19 @@ from .sessions import Sessions
 def commands():
     return {
         Open.cmd: {
-            "instance": Open(),
+            "class": Open,
             "description": Open.description,
         },
         Info.cmd: {
-            "instance": Info(),
+            "class": Info,
             "description": Info.description,
         },
         Close.cmd: {
-            "instance": Close(),
+            "class": Close,
             "description": Close.description,
         },
         Sessions.cmd: {
-            "instance": Sessions(),
+            "class": Sessions,
             "description": Sessions.description,
         },
     }
