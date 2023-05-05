@@ -13,14 +13,14 @@ class Open(Command):
     description = "Open a session to a file"
 
     def __init__(self) -> None:
-        super(Open, self).__init__()
+        super().__init__()
         self.args_parser.add_argument(
             "--file", "-f", action="store", help="Open the file specified at path"
         )
 
     def run(self) -> None:
         try:
-            super(Open, self).run()
+            super().run()
         except CommandRunError:
             return
 

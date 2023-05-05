@@ -17,7 +17,7 @@ class Projects(Command):
     description = "List or switch existing projects"
 
     def __init__(self) -> None:
-        super(Projects, self).__init__()
+        super().__init__()
 
         group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
@@ -44,7 +44,7 @@ class Projects(Command):
 
     def run(self) -> None:
         try:
-            super(Projects, self).run()
+            super().run()
         except CommandRunError:
             return
 

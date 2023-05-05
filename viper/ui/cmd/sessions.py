@@ -12,7 +12,7 @@ class Sessions(Command):
     description = "List or switch sessions"
 
     def __init__(self) -> None:
-        super(Sessions, self).__init__()
+        super().__init__()
         group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
             "-l", "--list", action="store_true", help="List all existing sessions"
@@ -23,7 +23,7 @@ class Sessions(Command):
 
     def run(self) -> None:
         try:
-            super(Sessions, self).run()
+            super().run()
         except CommandRunError:
             return
 
