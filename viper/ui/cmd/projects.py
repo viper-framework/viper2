@@ -13,7 +13,7 @@ class Projects(Command):
     cmd = "projects"
     description = "List or switch existing projects"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Projects, self).__init__()
 
         group = self.args_parser.add_mutually_exclusive_group()
@@ -39,7 +39,7 @@ class Projects(Command):
             help="Delete the specified project",
         )
 
-    def run(self):
+    def run(self) -> None:
         try:
             super(Projects, self).run()
         except CommandRunError:

@@ -11,7 +11,7 @@ class Info(Command):
     cmd = "info"
     description = "Show information on the open file"
 
-    def run(self):
+    def run(self) -> None:
         if not sessions.current:
             log.error("No open session! This command expects a file to be open")
             return

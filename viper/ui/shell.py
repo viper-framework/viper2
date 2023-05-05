@@ -19,11 +19,11 @@ log = logging.getLogger("viper")
 
 
 class Shell:
-    def __init__(self):
+    def __init__(self) -> None:
         self.__running = True
         self.__commands = commands()
 
-    def __prompt(self):
+    def __prompt(self) -> None:
         project_name = ""
         if not projects.current.is_default():
             project_name = f"{projects.current.name} "
@@ -38,11 +38,11 @@ class Shell:
             end="",
         )
 
-    def exit(self):
+    def exit(self) -> None:
         log.info("Exiting...")
         self.__running = False
 
-    def help(self):
+    def help(self) -> None:
         rows = [
             ["help", "Display this help message"],
             ["exit, quit", "Exit from the Viper shell"],
@@ -53,7 +53,7 @@ class Shell:
         log.info("[bold]Commands:[/]")
         log.table({"columns": ["Command", "Description"], "rows": rows})
 
-    def run(self):
+    def run(self) -> None:
         logo()
 
         session = PromptSession()

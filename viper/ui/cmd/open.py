@@ -12,13 +12,13 @@ class Open(Command):
     cmd = "open"
     description = "Open a session to a file"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Open, self).__init__()
         self.args_parser.add_argument(
             "--file", "-f", action="store", help="Open the file specified at path"
         )
 
-    def run(self):
+    def run(self) -> None:
         try:
             super(Open, self).run()
         except CommandRunError:

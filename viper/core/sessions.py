@@ -8,7 +8,7 @@ log = logging.getLogger("viper")
 
 
 class Session:
-    def __init__(self):
+    def __init__(self) -> None:
         self.id = None
         self.file = None
         self.created_at = datetime.datetime.fromtimestamp(time.time()).strftime(
@@ -17,7 +17,7 @@ class Session:
 
 
 class Sessions:
-    def __init__(self):
+    def __init__(self) -> None:
         self.current = None
         self.__sessions = []
         self.__last_find = None

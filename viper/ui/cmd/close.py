@@ -7,5 +7,5 @@ class Close(Command):
     cmd = "close"
     description = "Close the current session"
 
-    def run(self):
+    def run(self) -> None:
         sessions.close()

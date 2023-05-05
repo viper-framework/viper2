@@ -28,7 +28,7 @@ class Project:
 
 
 class Projects:
-    def __init__(self):
+    def __init__(self) -> None:
         self.current = Project(project_default)
 
     def open(self, name: str):

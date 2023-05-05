@@ -11,7 +11,7 @@ class Sessions(Command):
     cmd = "sessions"
     description = "List or switch sessions"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Sessions, self).__init__()
         group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
@@ -21,7 +21,7 @@ class Sessions(Command):
             "-s", "--switch", type=int, help="Switch to the specified session"
         )
 
-    def run(self):
+    def run(self) -> None:
         try:
             super(Sessions, self).run()
         except CommandRunError:

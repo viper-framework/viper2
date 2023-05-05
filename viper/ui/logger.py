@@ -1,16 +1,17 @@
 import logging
 from functools import partial, partialmethod
 from logging import StreamHandler
+from typing import Any
 
 from rich.console import Console
 from rich.table import Table
 
 
 class ShellHandler(StreamHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         StreamHandler.__init__(self)
 
-    def emit(self, record):
+    def emit(self, record: Any) -> None:
         console = Console()
 
         if record.levelno == logging.DEBUG:
@@ -39,7 +40,7 @@ class ShellHandler(StreamHandler):
             console.print(f"[red]FATAL: {record.msg}[/]")
 
 
-def init_logging():
+def init_logging() -> None:
     logging.basicConfig(level=logging.INFO)
 
     logging.TABLE = 21
