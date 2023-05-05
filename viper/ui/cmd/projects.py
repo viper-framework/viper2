@@ -61,18 +61,12 @@ class Projects(Command):
                 rows.append([project_name, project_ct_date])
 
             log.table({"columns": ["Project Name", "Creation Date"], "rows": rows})
-            return
-
-        if self.args.switch:
+        elif self.args.switch:
             projects.open(self.args.switch)
             log.success(f"Switched to project with name {self.args.switch}")
-            return
-
-        if self.args.close:
+        elif self.args.close:
             projects.close()
-            return
-
-        if self.args.delete:
+        elif self.args.delete:
             delete = confirm(
                 "Are you sure? This will permanently delete all files in that project!"
             )
@@ -89,6 +83,5 @@ class Projects(Command):
                     return
 
             log.error(f"Could not find a project with name {self.args.delete}")
-            return
-
-        self.args_parser.print_usage()
+        else:
+            self.args_parser.print_usage()

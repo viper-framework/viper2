@@ -7,9 +7,10 @@ from viper.common.file import File
 log = logging.getLogger("viper")
 
 
+# pylint: disable=too-few-public-methods
 class Session:
     def __init__(self) -> None:
-        self.id = None
+        self.id = None  # pylint: disable=invalid-name
         self.file = None
         self.created_at = datetime.datetime.fromtimestamp(time.time()).strftime(
             "%Y-%m-%d %H:%M:%S"
@@ -20,7 +21,6 @@ class Sessions:
     def __init__(self) -> None:
         self.current = None
         self.__sessions = []
-        self.__last_find = None
 
     def list(self) -> list:
         return self.__sessions

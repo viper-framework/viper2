@@ -4,15 +4,17 @@ from os.path import expanduser
 
 log = logging.getLogger("viper")
 
-project_default = "default"
+PROJECT_DEFAULT = "default"
+
 viper_root_path = os.path.join(expanduser("~"), ".viper")
 viper_projects_path = os.path.join(viper_root_path, "projects")
 
 
+# pylint: disable=too-few-public-methods
 class Project:
     def __init__(self, name: str) -> None:
         self.name = name
-        if self.name == project_default:
+        if self.name == PROJECT_DEFAULT:
             self.path = viper_root_path
         else:
             self.path = os.path.join(viper_projects_path, self.name)
@@ -21,7 +23,7 @@ class Project:
             os.makedirs(self.path)
 
     def is_default(self) -> bool:
-        if self.name == project_default:
+        if self.name == PROJECT_DEFAULT:
             return True
 
         return False
@@ -29,14 +31,14 @@ class Project:
 
 class Projects:
     def __init__(self) -> None:
-        self.current = Project(project_default)
+        self.current = Project(PROJECT_DEFAULT)
 
     def open(self, name: str) -> None:
         self.current = Project(name)
 
     def close(self) -> None:
-        if self.current and self.current.name != project_default:
-            self.current = Project(project_default)
+        if self.current and self.current.name != PROJECT_DEFAULT:
+            self.current = Project(PROJECT_DEFAULT)
 
     def list(self) -> list:
         projects_list = []

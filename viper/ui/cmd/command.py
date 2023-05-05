@@ -22,5 +22,5 @@ class Command:
     def run(self) -> None:
         try:
             self.args = self.args_parser.parse_args(self.__args_input)
-        except ArgumentError:
-            raise CommandRunError()
+        except ArgumentError as exc:
+            raise CommandRunError() from exc

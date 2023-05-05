@@ -3,7 +3,6 @@ import shlex
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.history import InMemoryHistory
 from rich.console import Console
 
 from viper.core.projects import projects
@@ -47,8 +46,8 @@ class Shell:
             ["help", "Display this help message"],
             ["exit, quit", "Exit from the Viper shell"],
         ]
-        for cmd in self.__commands:
-            rows.append([cmd, self.__commands[cmd]["description"]])
+        for cmd_name, cmd_properties in self.__commands.items():
+            rows.append([cmd_name, cmd_properties["description"]])
 
         log.info("[bold]Commands:[/]")
         log.table({"columns": ["Command", "Description"], "rows": rows})
@@ -75,7 +74,7 @@ class Shell:
             cmd_name = cmd_words[0].lower().strip()
             cmd_args = cmd_words[1:]
 
-            if cmd_name == "exit" or cmd_name == "quit":
+            if cmd_name in ("exit", "quit"):
                 self.exit()
                 continue
 
@@ -83,7 +82,7 @@ class Shell:
                 self.help()
                 continue
 
-            if cmd_name in self.__commands.keys():
+            if cmd_name in self.__commands:
                 cmd = self.__commands[cmd_name]["class"]()
                 cmd.add_args(*cmd_args)
                 cmd.run()

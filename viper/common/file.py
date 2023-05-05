@@ -3,9 +3,9 @@ import hashlib
 import os
 
 
+# pylint: disable=too-many-instance-attributes
 class File:
     def __init__(self, path: str):
-        self.id = None
         self.path = path
         self.name = ""
         self.size = 0
@@ -32,15 +32,12 @@ class File:
             return handle.read()
 
     def __chunks(self):
-        try:
-            with open(self.path, "rb") as fd:
-                while True:
-                    chunk = fd.read(16 * 1024)
-                    if not chunk:
-                        break
-                    yield chunk
-        except Exception:
-            return
+        with open(self.path, "rb") as handle:
+            while True:
+                chunk = handle.read(16 * 1024)
+                if not chunk:
+                    break
+                yield chunk
 
     def __hashes(self):
         crc = 0
@@ -56,6 +53,7 @@ class File:
             sha256.update(chunk)
             sha512.update(chunk)
 
+        # pylint: disable=consider-using-f-string
         self.crc32 = "".join("%02X" % ((crc >> i) & 0xFF) for i in [24, 16, 8, 0])
         self.md5 = md5.hexdigest()
         self.sha1 = sha1.hexdigest()

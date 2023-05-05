@@ -21,6 +21,43 @@ class Sessions(Command):
             "-s", "--switch", type=int, help="Switch to the specified session"
         )
 
+    def __list(self) -> None:
+        if not sessions.list():
+            log.info("There are no open sessions")
+            return
+
+        rows = []
+        for session in sessions.list():
+            current = ""
+            if session == sessions.current:
+                current = "Yes"
+
+            rows.append(
+                [
+                    str(session.id),
+                    session.file.name,
+                    session.file.sha1,
+                    session.created_at,
+                    current,
+                ]
+            )
+
+        log.info("[bold]Open sessions:[/]")
+        log.table(
+            {
+                "columns": ["#", "Name", "SHA1", "Created At", "Current"],
+                "rows": rows,
+            },
+        )
+
+    def __switch(self, session_id: int) -> None:
+        for session in sessions.list():
+            if session_id == session.id:
+                sessions.switch(session)
+                return
+
+        log.error("The specified session ID doesn't seem to exist")
+
     def run(self) -> None:
         try:
             super().run()
@@ -28,42 +65,8 @@ class Sessions(Command):
             return
 
         if self.args.list:
-            if not sessions.list():
-                log.info("There are no open sessions")
-                return
-
-            rows = []
-            for session in sessions.list():
-                current = ""
-                if session == sessions.current:
-                    current = "Yes"
-
-                rows.append(
-                    [
-                        str(session.id),
-                        session.file.name,
-                        session.file.sha1,
-                        session.created_at,
-                        current,
-                    ]
-                )
-
-            log.info("[bold]Open sessions:[/]")
-            log.table(
-                {
-                    "columns": ["#", "Name", "SHA1", "Created At", "Current"],
-                    "rows": rows,
-                },
-            )
-            return
-
-        if self.args.switch:
-            for session in sessions.list():
-                if self.args.switch == session.id:
-                    sessions.switch(session)
-                    return
-
-            log.error("The specified session ID doesn't seem to exist")
-            return
-
-        self.args_parser.print_usage()
+            self.__list()
+        elif self.args.switch:
+            self.__switch(self.args.switch)
+        else:
+            self.args_parser.print_usage()
