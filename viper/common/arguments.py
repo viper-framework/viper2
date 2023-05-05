@@ -1,7 +1,9 @@
 import argparse
 from typing import Optional
 
-from .exceptions import ArgumentError
+
+class ArgumentError(Exception):
+    pass
 
 
 class ArgumentParser(argparse.ArgumentParser):

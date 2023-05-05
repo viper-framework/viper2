@@ -85,7 +85,8 @@ class Shell:
 
             if cmd_name in self.__commands.keys():
                 cmd = self.__commands[cmd_name]["class"]()
-                cmd.run(*cmd_args)
+                cmd.add_args(*cmd_args)
+                cmd.run()
                 continue
 
             log.error(f'No command or module found for "{cmd_name}"')

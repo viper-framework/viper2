@@ -1,12 +1,10 @@
 import logging
 import os
 import time
-from typing import Any
 
-from viper.common.exceptions import ArgumentError
 from viper.core.projects import projects
 
-from .command import Command
+from .command import Command, CommandRunError
 
 log = logging.getLogger("viper")
 
@@ -18,7 +16,7 @@ class Projects(Command):
     def __init__(self):
         super(Projects, self).__init__()
 
-        group = self.argparser.add_mutually_exclusive_group()
+        group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
             "-l", "--list", action="store_true", help="List all existing projects"
         )
@@ -41,13 +39,13 @@ class Projects(Command):
             help="Delete the specified project",
         )
 
-    def run(self, *args: Any):
+    def run(self):
         try:
-            args = self.argparser.parse_args(args)
-        except ArgumentError:
+            super(Projects, self).run()
+        except CommandRunError:
             return
 
-        if args.list:
+        if self.args.list:
             projects_list = projects.list()
             if len(projects_list) == 0:
                 log.info("There are no projects currently")
@@ -62,14 +60,13 @@ class Projects(Command):
             log.table({"columns": ["Project Name", "Creation Date"], "rows": rows})
             return
 
-        if args.switch:
-            projects.open(args.switch)
-            log.success(f"Switched to project with name {args.switch}")
+        if self.args.switch:
+            projects.open(self.args.switch)
+            log.success(f"Switched to project with name {self.args.switch}")
             return
 
-        if args.close:
+        if self.args.close:
             projects.close()
             return
 
-        log.error("You you didn't provide any action")
-        self.argparser.print_usage()
+        self.args_parser.print_usage()

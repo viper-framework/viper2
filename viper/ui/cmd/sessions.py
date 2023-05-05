@@ -1,10 +1,8 @@
 import logging
-from typing import Any
 
-from viper.common.exceptions import ArgumentError
 from viper.core.sessions import sessions
 
-from .command import Command
+from .command import Command, CommandRunError
 
 log = logging.getLogger("viper")
 
@@ -15,7 +13,7 @@ class Sessions(Command):
 
     def __init__(self):
         super(Sessions, self).__init__()
-        group = self.argparser.add_mutually_exclusive_group()
+        group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
             "-l", "--list", action="store_true", help="List all existing sessions"
         )
@@ -23,13 +21,13 @@ class Sessions(Command):
             "-s", "--switch", type=int, help="Switch to the specified session"
         )
 
-    def run(self, *args: Any):
+    def run(self):
         try:
-            args = self.argparser.parse_args(args)
-        except ArgumentError:
+            super(Sessions, self).run()
+        except CommandRunError:
             return
 
-        if args.list:
+        if self.args.list:
             if not sessions.list():
                 log.info("There are no open sessions")
                 return
@@ -57,12 +55,15 @@ class Sessions(Command):
                     "rows": rows,
                 },
             )
-        elif args.switch:
+            return
+
+        if self.args.switch:
             for session in sessions.list():
-                if args.switch == session.id:
+                if self.args.switch == session.id:
                     sessions.switch(session)
                     return
 
             log.error("The specified session ID doesn't seem to exist")
-        else:
-            self.argparser.print_usage()
+            return
+
+        self.args_parser.print_usage()

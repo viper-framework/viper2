@@ -1,11 +1,9 @@
 import logging
 import os
-from typing import Any
 
-from viper.common.exceptions import ArgumentError
 from viper.core.sessions import sessions
 
-from .command import Command
+from .command import Command, CommandRunError
 
 log = logging.getLogger("viper")
 
@@ -16,23 +14,24 @@ class Open(Command):
 
     def __init__(self):
         super(Open, self).__init__()
-        self.argparser.add_argument(
+        self.args_parser.add_argument(
             "--file", "-f", action="store", help="Open the file specified at path"
         )
 
-    def run(self, *args: Any):
+    def run(self):
         try:
-            args = self.argparser.parse_args(args)
-        except ArgumentError:
+            super(Open, self).run()
+        except CommandRunError:
             return
 
-        if args.file:
-            if not os.path.exists(args.file):
-                log.error("The specified file at path %s does not exist", args.file)
+        if self.args.file:
+            if not os.path.exists(self.args.file):
+                log.error(
+                    "The specified file at path %s does not exist", self.args.file
+                )
                 return
 
-            sessions.new(args.file)
+            sessions.new(self.args.file)
             return
 
-        log.error("You need to specify how to open the file")
-        self.argparser.print_usage()
+        self.args_parser.print_usage()
