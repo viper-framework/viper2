@@ -1,6 +1,9 @@
 import logging
 import os
+import shutil
 import time
+
+from prompt_toolkit.shortcuts import confirm
 
 from viper.core.projects import projects
 
@@ -67,6 +70,25 @@ class Projects(Command):
 
         if self.args.close:
             projects.close()
+            return
+
+        if self.args.delete:
+            delete = confirm(
+                "Are you sure? This will permanently delete all files in that project!"
+            )
+            if not delete:
+                return
+
+            if projects.current.name == self.args.delete:
+                projects.close()
+
+            for project_path in projects.list():
+                if os.path.basename(project_path) == self.args.delete:
+                    shutil.rmtree(project_path)
+                    log.success(f"Successfully deleted project at path {project_path}")
+                    return
+
+            log.error(f"Could not find a project with name {self.args.delete}")
             return
 
         self.args_parser.print_usage()
