@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from viper.core.sessions import sessions
 
@@ -9,16 +8,10 @@ log = logging.getLogger("viper")
 
 
 class Info(Command):
-    """
-    This command returns information on the open session. It returns details
-    on the file (e.g. hashes) and other information that might available from
-    the database.
-    """
-
     cmd = "info"
     description = "Show information on the open file"
 
-    def run(self, *args: Any):
+    def run(self):
         if not sessions.current:
             log.error("No open session! This command expects a file to be open")
             return
