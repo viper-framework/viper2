@@ -1,6 +1,7 @@
 from .close import Close
 from .info import Info
 from .open import Open
+from .projects import Projects
 from .sessions import Sessions
 
 
@@ -22,4 +23,8 @@ def commands():
             "class": Sessions,
             "description": Sessions.description,
         },
+        Projects.cmd: {
+            "class": Projects,
+            "description": Projects.description
+        }
     }

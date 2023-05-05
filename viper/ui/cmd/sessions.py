@@ -1,12 +1,13 @@
 import logging
 from typing import Any
 
-from viper.core.sessions import sessions
 from viper.common.exceptions import ArgumentError
+from viper.core.sessions import sessions
 
 from .command import Command
 
 log = logging.getLogger("viper")
+
 
 class Sessions(Command):
     cmd = "sessions"

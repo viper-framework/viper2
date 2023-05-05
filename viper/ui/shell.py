@@ -6,6 +6,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import InMemoryHistory
 from rich.console import Console
 
+from viper.core.projects import projects
 from viper.core.sessions import sessions
 
 from .cmd import commands
@@ -23,12 +24,16 @@ class Shell:
         self.__commands = commands()
 
     def __prompt(self):
+        project_name = ""
+        if not projects.current.is_default():
+            project_name = f"{projects.current.name} "
+
         file_name = ""
         if sessions.current:
             file_name = sessions.current.file.name
 
         console = Console()
-        console.print(f"[cyan]viper[/] [white]{file_name}[/][cyan]>[/] ", end="")
+        console.print(f"[bold cyan]{project_name}[/][cyan]viper[/] [white]{file_name}[/][cyan]>[/] ", end="")
 
     def exit(self):
         log.info("Exiting...")
