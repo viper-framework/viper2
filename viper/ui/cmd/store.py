@@ -15,15 +15,15 @@ class Store(Command):
     cmd = "store"
     description = "Store one or multiple files in the database and the local repository"
 
-    def add_file(self, file_object: FileObject, tags=None) -> str | None:
+    def add_file(self, file_object: FileObject, tags=None) -> str:
         storage = Storage()
         if storage.get_file_path(projects.current.path, file_object.sha256):
             log.warning(f'Skip, file "{file_object.name}" appears to be already stored')
-            return None
+            return ""
 
         status = Database().add(file_object=file_object, tags=tags)
         if not status:
-            return None
+            return ""
 
         # If succeeds, store also in the local repository.
         # If something fails in the database (for example unicode strings)

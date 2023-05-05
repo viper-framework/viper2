@@ -11,11 +11,11 @@ class Storage:
         self.root_path = os.path.join(os.path.expanduser("~"), ".viper")
         self.projects_path = os.path.join(self.root_path, "projects")
 
-    def add_file(self, project_path: str, file_object: FileObject) -> str | None:
+    def add_file(self, project_path: str, file_object: FileObject) -> str:
         sha256 = file_object.sha256
         if not sha256:
             log.error("The file does not have a valid sha256 hash")
-            return None
+            return ""
 
         file_dir = os.path.join(
             project_path, "files", sha256[0], sha256[1], sha256[2], sha256[3]
@@ -37,12 +37,12 @@ class Storage:
         log.success("Successfully stored file in repository")
         return file_path
 
-    def get_file_path(self, project_path: str, sha256: str) -> str | None:
+    def get_file_path(self, project_path: str, sha256: str) -> str:
         file_path = os.path.join(
             project_path, "binaries", sha256[0], sha256[1], sha256[2], sha256[3], sha256
         )
 
         if not os.path.exists(file_path):
-            return None
+            return ""
 
         return file_path
