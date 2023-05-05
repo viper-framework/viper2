@@ -8,7 +8,7 @@ class Command:
     description = ""
 
     def __init__(self):
-        self.args = ArgumentParser(prog=self.cmd, description=self.description)
+        self.argparser = ArgumentParser(prog=self.cmd, description=self.description)
 
     def run(self, *args: Any):
         raise NotImplementedError

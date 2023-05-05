@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Any
 
-from viper.common.exceptions import ArgumentErrorCallback
+from viper.common.exceptions import ArgumentError
 from viper.core.sessions import sessions
 
 from .command import Command
@@ -16,14 +16,14 @@ class Open(Command):
 
     def __init__(self):
         super(Open, self).__init__()
-        self.args.add_argument(
+        self.argparser.add_argument(
             "--file", "-f", action="store", help="Open the file specified at path"
         )
 
     def run(self, *args: Any):
         try:
-            args = self.args.parse_args(args)
-        except ArgumentErrorCallback:
+            args = self.argparser.parse_args(args)
+        except ArgumentError:
             return
 
         if args.file:
@@ -35,8 +35,4 @@ class Open(Command):
             return
 
         log.error("You need to specify how to open the file")
-
-        try:
-            self.args.print_usage()
-        except ArgumentErrorCallback:
-            pass
+        self.argparser.print_usage()
