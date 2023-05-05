@@ -3,6 +3,5 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from viper.ui.shell import Shell
-s = Shell()
-s.run()
+from viper.ui import main
+main()
