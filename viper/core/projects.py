@@ -10,7 +10,7 @@ viper_projects_path = os.path.join(viper_root_path, "projects")
 
 
 class Project:
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
         if self.name == project_default:
             self.path = viper_root_path
@@ -31,10 +31,10 @@ class Projects:
     def __init__(self) -> None:
         self.current = Project(project_default)
 
-    def open(self, name: str):
+    def open(self, name: str) -> None:
         self.current = Project(name)
 
-    def close(self):
+    def close(self) -> None:
         if self.current and self.current.name != project_default:
             self.current = Project(project_default)
 

@@ -22,16 +22,16 @@ class Sessions:
         self.__sessions = []
         self.__last_find = None
 
-    def list(self):
+    def list(self) -> list:
         return self.__sessions
 
-    def close(self):
+    def close(self) -> None:
         self.current = None
 
-    def switch(self, session: Session):
+    def switch(self, session: Session) -> None:
         self.current = session
 
-    def new(self, file_path: str):
+    def new(self, file_path: str) -> None:
         target_file = File(file_path)
         for session in self.__sessions:
             if session.file and session.file.path == session.file.path:
