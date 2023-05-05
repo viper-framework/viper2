@@ -23,8 +23,5 @@ def commands():
             "class": Sessions,
             "description": Sessions.description,
         },
-        Projects.cmd: {
-            "class": Projects,
-            "description": Projects.description
-        }
+        Projects.cmd: {"class": Projects, "description": Projects.description},
     }

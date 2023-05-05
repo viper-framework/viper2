@@ -10,6 +10,7 @@ from .command import Command
 
 log = logging.getLogger("viper")
 
+
 class Projects(Command):
     cmd = "projects"
     description = "List or switch existing projects"
@@ -72,4 +73,3 @@ class Projects(Command):
 
         log.error("You you didn't provide any action")
         self.argparser.print_usage()
-

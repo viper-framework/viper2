@@ -8,6 +8,7 @@ project_default = "default"
 viper_root_path = os.path.join(expanduser("~"), ".viper")
 viper_projects_path = os.path.join(viper_root_path, "projects")
 
+
 class Project:
     def __init__(self, name: str):
         self.name = name
@@ -24,6 +25,7 @@ class Project:
             return True
 
         return False
+
 
 class Projects:
     def __init__(self):
@@ -42,5 +44,6 @@ class Projects:
             projects_list.append(os.path.join(viper_projects_path, project_name))
 
         return projects_list
+
 
 projects = Projects()

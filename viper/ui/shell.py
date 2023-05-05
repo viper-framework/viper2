@@ -33,7 +33,10 @@ class Shell:
             file_name = sessions.current.file.name
 
         console = Console()
-        console.print(f"[bold cyan]{project_name}[/][cyan]viper[/] [white]{file_name}[/][cyan]>[/] ", end="")
+        console.print(
+            f"[bold cyan]{project_name}[/][cyan]viper[/] [white]{file_name}[/][cyan]>[/] ",
+            end="",
+        )
 
     def exit(self):
         log.info("Exiting...")
