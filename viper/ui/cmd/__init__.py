@@ -7,9 +7,9 @@ from .sessions import Sessions
 
 def commands():
     return {
-        Open.cmd: {"class": Open, "description": Open.description},
-        Info.cmd: {"class": Info, "description": Info.description},
         Close.cmd: {"class": Close, "description": Close.description},
-        Sessions.cmd: {"class": Sessions, "description": Sessions.description},
+        Info.cmd: {"class": Info, "description": Info.description},
+        Open.cmd: {"class": Open, "description": Open.description},
         Projects.cmd: {"class": Projects, "description": Projects.description},
+        Sessions.cmd: {"class": Sessions, "description": Sessions.description},
     }
