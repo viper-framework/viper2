@@ -3,6 +3,7 @@ from .info import Info
 from .open import Open
 from .projects import Projects
 from .sessions import Sessions
+from .store import Store
 
 
 def commands():
@@ -12,4 +13,5 @@ def commands():
         Open.cmd: {"class": Open, "description": Open.description},
         Projects.cmd: {"class": Projects, "description": Projects.description},
         Sessions.cmd: {"class": Sessions, "description": Sessions.description},
+        Store.cmd: {"class": Store, "description": Store.description},
     }

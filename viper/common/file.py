@@ -31,7 +31,7 @@ class FileObject:
         with open(self.path, "rb") as handle:
             return handle.read()
 
-    def __chunks(self):
+    def get_chunks(self):
         with open(self.path, "rb") as handle:
             while True:
                 chunk = handle.read(16 * 1024)
@@ -46,7 +46,7 @@ class FileObject:
         sha256 = hashlib.sha256()
         sha512 = hashlib.sha512()
 
-        for chunk in self.__chunks():
+        for chunk in self.get_chunks():
             crc = binascii.crc32(chunk, crc)
             md5.update(chunk)
             sha1.update(chunk)

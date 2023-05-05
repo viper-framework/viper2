@@ -32,9 +32,9 @@ class Sessions:
         self.current = session
 
     def new(self, file_path: str) -> None:
-        target_file = FileObject(file_path)
+        file_object = FileObject(file_path)
         for session in self.__sessions:
-            if session.file and session.file.path == session.file.path:
+            if session.file and session.file.path == file_path:
                 log.error(
                     f"There is already a session open with file to path {session.file.path}"
                 )
@@ -42,7 +42,7 @@ class Sessions:
 
         session = Session()
         session.id = len(self.__sessions) + 1
-        session.file = target_file
+        session.file = file_object
 
         self.__sessions.append(session)
         self.current = session
