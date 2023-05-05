@@ -1,6 +1,5 @@
 import logging
 import shlex
-from io import StringIO
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -28,11 +27,8 @@ class Shell:
         if sessions.current:
             file_name = sessions.current.file.name
 
-        # TODO: For some reason the colors don't seem to get formatted properly.
-        #       Need to look into this.
-        console = Console(file=StringIO())
-        console.print(f"[cyan]viper[/] [white]{file_name}[/][cyan]>[/] ")
-        return console.file.getvalue().strip("\n")
+        console = Console()
+        console.print(f"[cyan]viper[/] [white]{file_name}[/][cyan]>[/] ", end="")
 
     def exit(self):
         log.info("Exiting...")
@@ -55,11 +51,9 @@ class Shell:
         session = PromptSession()
 
         while self.__running:
-            prompt = self.__prompt()
             try:
-                cmd_string = session.prompt(
-                    prompt, auto_suggest=AutoSuggestFromHistory()
-                )
+                self.__prompt()
+                cmd_string = session.prompt(auto_suggest=AutoSuggestFromHistory())
             except KeyboardInterrupt:
                 continue
             except EOFError:
@@ -86,4 +80,4 @@ class Shell:
                 cmd.run(*cmd_args)
                 continue
 
-            log.error('No command or module found for "%s"', cmd_name)
+            log.error(f'No command or module found for "{cmd_name}"')
