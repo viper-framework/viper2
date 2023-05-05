@@ -4,7 +4,7 @@ import os
 
 
 # pylint: disable=too-many-instance-attributes
-class File:
+class FileObject:
     def __init__(self, path: str):
         self.path = path
         self.name = ""

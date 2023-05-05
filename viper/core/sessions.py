@@ -2,7 +2,7 @@ import datetime
 import logging
 import time
 
-from viper.common.file import File
+from viper.common.file import FileObject
 
 log = logging.getLogger("viper")
 
@@ -32,7 +32,7 @@ class Sessions:
         self.current = session
 
     def new(self, file_path: str) -> None:
-        target_file = File(file_path)
+        target_file = FileObject(file_path)
         for session in self.__sessions:
             if session.file and session.file.path == session.file.path:
                 log.error(
