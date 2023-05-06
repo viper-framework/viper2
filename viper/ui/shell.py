@@ -111,6 +111,7 @@ class Shell:
 
             if cmd_name in self.__modules:
                 mod = self.__modules[cmd_name]["class"]()
+                mod.add_args(*cmd_args)
                 mod.run()
                 continue
 
