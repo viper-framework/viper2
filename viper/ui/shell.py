@@ -6,9 +6,9 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
 
+from viper.core.modules import load_modules
 from viper.core.projects import projects
 from viper.core.sessions import sessions
-from viper.core.modules import load_modules
 
 from .cmd import load_commands
 from .logger import init_logging
