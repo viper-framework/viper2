@@ -42,7 +42,7 @@ class File(Base):
     id = Column(Integer(), primary_key=True)
     name = Column(String(255), nullable=True)
     size = Column(Integer(), nullable=False)
-    type = Column(Text(), nullable=True)
+    magic = Column(Text(), nullable=True)
     mime = Column(String(255), nullable=True)
     md5 = Column(String(32), nullable=False, index=True)
     crc32 = Column(String(8), nullable=False)
@@ -84,7 +84,7 @@ class File(Base):
         sha256: str,
         sha512: str,
         size: int,
-        type: Optional[str] = None,
+        magic: Optional[str] = None,
         mime: Optional[str] = None,
         ssdeep: Optional[str] = None,
         name: Optional[str] = None,
@@ -96,7 +96,7 @@ class File(Base):
         self.sha256 = sha256
         self.sha512 = sha512
         self.size = size
-        self.type = type
+        self.magic = magic
         self.mime = mime
         self.ssdeep = ssdeep
         self.name = name
@@ -177,7 +177,7 @@ class FileManager(BaseManager):
                     sha256=file_object.sha256,
                     sha512=file_object.sha512,
                     size=file_object.size,
-                    type=file_object.type,
+                    magic=file_object.magic,
                     mime=file_object.mime,
                     ssdeep=file_object.ssdeep,
                     name=name,
@@ -283,7 +283,7 @@ class FileManager(BaseManager):
                 | File.md5.startswith(str(value))
                 | File.sha1.startswith(str(value))
                 | File.sha256.startswith(str(value))
-                | File.type.contains(str(value))
+                | File.magic.contains(str(value))
                 | File.mime.contains(str(value))
             )
             .all(),
@@ -293,7 +293,7 @@ class FileManager(BaseManager):
             "sha256": self.session.query(File).filter(File.sha256 == value).all(),
             "name": self.get_files_by_name_pattern(value),
             "note": self.get_files_by_note_pattern(value),
-            "type": self.session.query(File).filter(File.type.like(f"%{value}%")).all(),
+            "magic": self.session.query(File).filter(File.magic.like(f"%{value}%")).all(),
             "mime": self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
         }
 
