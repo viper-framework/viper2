@@ -147,25 +147,211 @@ class Note(Base):
         self.body = body
 
 
-class Database:
-    def __init__(self) -> None:
-        self.db_path = os.path.join(projects.current.path, "viper.db")
-        self.engine = create_engine(f"sqlite:///{self.db_path}", poolclass=NullPool)
-        self.engine.echo = False
-        self.engine.pool_timeout = 60
+# pylint: disable=too-few-public-methods
+class BaseManager:
+    def __init__(self, session):
+        self.session = session
 
-        Base.metadata.create_all(self.engine)
-        self.session = sessionmaker(bind=self.engine)
 
-        self.added_ids = {}
+class FileManager(BaseManager):
+    def add(
+        self,
+        file_object: FileObject,
+        name: Optional[str] = None,
+        parent_sha: Optional[str] = None,
+    ) -> bool:
+        if not name:
+            name = file_object.name
 
-    def __repr__(self):
-        return f"<{self.__class__.__name__}>"
+        if parent_sha:
+            parent_sha = (
+                self.session.query(File).filter(File.sha256 == parent_sha).first()
+            )
 
+        if isinstance(file_object, FileObject):
+            try:
+                file_entry = File(
+                    md5=file_object.md5,
+                    crc32=file_object.crc32,
+                    sha1=file_object.sha1,
+                    sha256=file_object.sha256,
+                    sha512=file_object.sha512,
+                    size=file_object.size,
+                    type=file_object.type,
+                    mime=file_object.mime,
+                    ssdeep=file_object.ssdeep,
+                    name=name,
+                    parent=parent_sha,
+                )
+                self.session.add(file_entry)
+                self.session.commit()
+            except IntegrityError:
+                self.session.rollback()
+                file_entry = (
+                    self.session.query(File).filter(File.md5 == file_object.md5).first()
+                )
+            except SQLAlchemyError as exc:
+                log.error(f"Unable to store file: {exc}")
+                self.session.rollback()
+                return False
+
+        return True
+
+    def delete_file(self, id: int) -> bool:
+        try:
+            file = self.session.query(File).get(id)
+            if not file:
+                log.error(
+                    "The open file doesn't appear to be in the database, have you stored it yet?"
+                )
+                return False
+
+            self.session.delete(file)
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            log.error(f"Unable to delete file: {exc}")
+            self.session.rollback()
+            return False
+        finally:
+            self.session.close()
+
+        return True
+
+    def get_latest_files(self, limit: int = 5, offset: int = 0) -> list:
+        try:
+            limit = int(limit)
+        except ValueError:
+            log.error("You need to specify a valid number as a limit for your query")
+            return []
+
+        rows = (
+            self.session.query(File)
+            .order_by(File.id.desc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+
+        return rows
+
+    def get_files_by_name_pattern(self, name_pattern: str) -> list:
+        if not name_pattern:
+            log.error(
+                "You need to specify a valid file name pattern (you can use wildcards)"
+            )
+            return []
+
+        if "*" in name_pattern:
+            name_pattern = name_pattern.replace("*", "%")
+        else:
+            name_pattern = f"%{name_pattern}%"
+
+        rows = self.session.query(File).filter(File.name.like(name_pattern)).all()
+        return rows
+
+    def get_files_by_note_pattern(
+        self, pattern: str, offset: Optional[int] = 0, limit: Optional[int] = None
+    ) -> list:
+        offset = int(offset)
+        limit = limit or 10
+        pattern = f"%{pattern}%"
+
+        rows = (
+            self.session.query(File)
+            .options(subqueryload(File.note))
+            .join(Note)
+            .filter(Note.body.like(pattern))
+            .order_by(File.id.desc())
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+
+        return rows
+
+    def find(
+        self, key: str, value: Optional[str] = None, offset: Optional[int] = 0
+    ) -> list:
+        queries = {
+            "all": self.session.query(File).options(subqueryload(File.tag)).all(),
+            "ssdeep": self.session.query(File)
+            .filter(File.ssdeep.contains(str(value)))
+            .all(),
+            "any": self.session.query(File)
+            .filter(
+                File.name.startswith(str(value))
+                | File.md5.startswith(str(value))
+                | File.sha1.startswith(str(value))
+                | File.sha256.startswith(str(value))
+                | File.type.contains(str(value))
+                | File.mime.contains(str(value))
+            )
+            .all(),
+            "latest": self.get_latest_files(value, offset),
+            "md5": self.session.query(File).filter(File.md5 == value).all(),
+            "sha1": self.session.query(File).filter(File.sha1 == value).all(),
+            "sha256": self.session.query(File).filter(File.sha256 == value).all(),
+            "name": self.get_files_by_name_pattern(value),
+            "note": self.get_files_by_note_pattern(value),
+            "type": self.session.query(File).filter(File.type.like(f"%{value}%")).all(),
+            "mime": self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
+        }
+
+        rows = queries.get(key)
+        if rows is None:
+            log.error("No valid term specified")
+            return []
+
+        return rows
+
+    def add_parent(self, file_sha256: str, parent_sha256: str) -> None:
+        try:
+            file = self.session.query(File).filter(File.sha256 == file_sha256).first()
+            file.parent = (
+                self.session.query(File).filter(File.sha256 == parent_sha256).first()
+            )
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            log.error(f"Unable to add parent: {exc}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+    def delete_parent(self, file_sha256: str) -> None:
+        try:
+            file = self.session.query(File).filter(File.sha256 == file_sha256).first()
+            file.parent = None
+            self.session.commit()
+        except SQLAlchemyError as exc:
+            log.error(f"Unable to delete parent: {exc}")
+            self.session.rollback()
+        finally:
+            self.session.close()
+
+    def get_parent(self, file_id: int) -> File:
+        file = self.session.query(File).get(file_id)
+        if not file.parent_id:
+            return None
+
+        parent = self.session.query(File).get(file.parent_id)
+        return parent
+
+    def get_children(self, parent_id: int) -> str:
+        children = self.session.query(File).filter(File.parent_id == parent_id).all()
+        child_samples = ""
+        for child in children:
+            child_samples += f"{child.sha256},"
+
+        return child_samples
+
+    def list_children(self, parent_id: str) -> list:
+        children = self.session.query(File).filter(File.parent_id == parent_id).all()
+        return children
+
+
+class TagManager(BaseManager):
     def add_tags(self, sha256: str, tags: Union[str, list]):
-        session = self.session()
-
-        file_entry = session.query(File).filter(File.sha256 == sha256).first()
+        file_entry = self.session.query(File).filter(File.sha256 == sha256).first()
         if not file_entry:
             return
 
@@ -186,27 +372,24 @@ class Database:
             try:
                 new_tag = Tag(tag)
                 file_entry.tag.append(new_tag)
-                session.commit()
-                self.added_ids.setdefault("tag", []).append(new_tag.id)
+                self.session.commit()
             except IntegrityError:
-                session.rollback()
+                self.session.rollback()
                 try:
                     file_entry.tag.append(
-                        session.query(Tag).filter(Tag.tag == tag).first()
+                        self.session.query(Tag).filter(Tag.tag == tag).first()
                     )
-                    session.commit()
+                    self.session.commit()
                 except SQLAlchemyError:
-                    session.rollback()
+                    self.session.rollback()
 
     def list_tags(self) -> list:
-        session = self.session()
-        rows = session.query(Tag).all()
+        rows = self.session.query(Tag).all()
         return rows
 
     def list_tags_for_file(self, sha256: str) -> list:
-        session = self.session()
         file = (
-            session.query(File)
+            self.session.query(File)
             .options(subqueryload(File.tag))
             .filter(File.sha256 == sha256)
             .first()
@@ -214,43 +397,42 @@ class Database:
         return file.tag
 
     def delete_tag(self, tag_name: str, sha256: str) -> None:
-        session = self.session()
-
         try:
             # First remove the tag from the sample
-            file_entry = session.query(File).filter(File.sha256 == sha256).first()
-            tag = session.query(Tag).filter(Tag.tag == tag_name).first()
+            file_entry = self.session.query(File).filter(File.sha256 == sha256).first()
+            tag = self.session.query(Tag).filter(Tag.tag == tag_name).first()
             try:
-                file_entry = session.query(File).filter(File.sha256 == sha256).first()
+                file_entry = (
+                    self.session.query(File).filter(File.sha256 == sha256).first()
+                )
                 file_entry.tag.remove(tag)
-                session.commit()
+                self.session.commit()
             except Exception:
                 log.error(f"Tag {tag_name} does not exist for this sample")
 
             # If tag has no entries drop it
             count = len(self.find("tag", tag_name))
             if count == 0:
-                session.delete(tag)
-                session.commit()
+                self.session.delete(tag)
+                self.session.commit()
                 log.warning(
                     f"Tag {tag_name} has no additional entries dropping from Database"
                 )
         except SQLAlchemyError as exc:
             log.error(f"Unable to delete tag: {exc}")
-            session.rollback()
+            self.session.rollback()
         finally:
-            session.close()
+            self.session.close()
 
+
+class NoteManager(BaseManager):
     def list_notes(self) -> list:
-        session = self.session()
-        rows = session.query(Note).all()
+        rows = self.session.query(Note).all()
         return rows
 
     def add_note(self, sha256: str, title: str, body: str) -> None:
-        session = self.session()
-
         if sha256 is not None:
-            file_entry = session.query(File).filter(File.sha256 == sha256).first()
+            file_entry = self.session.query(File).filter(File.sha256 == sha256).first()
             if not file_entry:
                 return
 
@@ -259,246 +441,55 @@ class Database:
             if sha256 is not None:
                 file_entry.note.append(new_note)
             else:
-                session.add(new_note)
+                self.session.add(new_note)
 
-            session.commit()
-            self.added_ids.setdefault("note", []).append(new_note.id)
+            self.session.commit()
         except SQLAlchemyError as exc:
             log.error(f"Unable to add note: {exc}")
-            session.rollback()
+            self.session.rollback()
         finally:
-            session.close()
+            self.session.close()
 
     def get_note(self, note_id: int) -> Note:
-        session = self.session()
-        note = session.query(Note).get(note_id)
-
-        return note
+        return self.session.query(Note).get(note_id)
 
     def edit_note(self, note_id: int, body: str) -> None:
-        session = self.session()
-
         try:
-            session.query(Note).get(note_id).body = body
-            session.commit()
+            self.session.query(Note).get(note_id).body = body
+            self.session.commit()
         except SQLAlchemyError as exc:
             log.error(f"Unable to update note: {exc}")
-            session.rollback()
+            self.session.rollback()
         finally:
-            session.close()
+            self.session.close()
 
     def delete_note(self, note_id: int) -> None:
-        session = self.session()
-
         try:
-            note = session.query(Note).get(note_id)
-            session.delete(note)
-            session.commit()
+            note = self.session.query(Note).get(note_id)
+            self.session.delete(note)
+            self.session.commit()
         except SQLAlchemyError as exc:
             log.error(f"Unable to delete note: {exc}")
-            session.rollback()
+            self.session.rollback()
         finally:
-            session.close()
+            self.session.close()
 
-    def add(
-        self,
-        file_object: FileObject,
-        name: Optional[str] = None,
-        tags: Optional[Union[str, list]] = None,
-        parent_sha: Optional[str] = None,
-        notes_body: Optional[str] = None,
-        notes_title: Optional[str] = None,
-    ) -> bool:
-        session = self.session()
 
-        if not name:
-            name = file_object.name
+# pylint: disable=too-few-public-methods
+class Database:
+    def __init__(self) -> None:
+        self.db_path = os.path.join(projects.current.path, "viper.db")
+        engine = create_engine(f"sqlite:///{self.db_path}", poolclass=NullPool)
+        engine.echo = False
+        engine.pool_timeout = 60
 
-        if parent_sha:
-            parent_sha = session.query(File).filter(File.sha256 == parent_sha).first()
+        Base.metadata.create_all(engine)
+        Session = sessionmaker(bind=engine)  # pylint: disable=invalid-name
+        self.session = Session()
 
-        if isinstance(file_object, FileObject):
-            try:
-                file_entry = File(
-                    md5=file_object.md5,
-                    crc32=file_object.crc32,
-                    sha1=file_object.sha1,
-                    sha256=file_object.sha256,
-                    sha512=file_object.sha512,
-                    size=file_object.size,
-                    type=file_object.type,
-                    mime=file_object.mime,
-                    ssdeep=file_object.ssdeep,
-                    name=name,
-                    parent=parent_sha,
-                )
-                session.add(file_entry)
-                session.commit()
-                self.added_ids.setdefault("file", []).append(file_entry.id)
-            except IntegrityError:
-                session.rollback()
-                file_entry = (
-                    session.query(File).filter(File.md5 == file_object.md5).first()
-                )
-            except SQLAlchemyError as exc:
-                log.error(f"Unable to store file: {exc}")
-                session.rollback()
-                return False
+        self.files = FileManager(self.session)
+        self.tags = TagManager(self.session)
+        self.notes = NoteManager(self.session)
 
-        if tags:
-            self.add_tags(sha256=file_object.sha256, tags=tags)
-
-        if notes_body and notes_title:
-            self.add_note(sha256=file_object.sha256, title=notes_title, body=notes_body)
-
-        return True
-
-    def delete_file(self, id: int) -> bool:
-        session = self.session()
-
-        try:
-            file = session.query(File).get(id)
-            if not file:
-                log.error(
-                    "The open file doesn't appear to be in the database, have you stored it yet?"
-                )
-                return False
-
-            session.delete(file)
-            session.commit()
-        except SQLAlchemyError as exc:
-            log.error(f"Unable to delete file: {exc}")
-            session.rollback()
-            return False
-        finally:
-            session.close()
-
-        return True
-
-    def find(
-        self, key: str, value: Optional[str] = None, offset: Optional[int] = 0
-    ) -> list:
-        session = self.session()
-        offset = int(offset)
-        rows = None
-
-        if key == "all":
-            rows = session.query(File).options(subqueryload(File.tag)).all()
-        elif key == "ssdeep":
-            ssdeep_val = str(value)
-            rows = session.query(File).filter(File.ssdeep.contains(ssdeep_val)).all()
-        elif key == "any":
-            prefix_val = str(value)
-            rows = (
-                session.query(File)
-                .filter(
-                    File.name.startswith(prefix_val)
-                    | File.md5.startswith(prefix_val)
-                    | File.sha1.startswith(prefix_val)
-                    | File.sha256.startswith(prefix_val)
-                    | File.type.contains(prefix_val)
-                    | File.mime.contains(prefix_val)
-                )
-                .all()
-            )
-        elif key == "latest":
-            if value:
-                try:
-                    value = int(value)
-                except ValueError:
-                    log.error(
-                        "You need to specify a valid number as a limit for your query"
-                    )
-                    return None
-            else:
-                value = 5
-
-            rows = (
-                session.query(File).order_by(File.id.desc()).limit(value).offset(offset)
-            )
-        elif key == "md5":
-            rows = session.query(File).filter(File.md5 == value).all()
-        elif key == "sha1":
-            rows = session.query(File).filter(File.sha1 == value).all()
-        elif key == "sha256":
-            rows = session.query(File).filter(File.sha256 == value).all()
-        # TODO: Re-enable this.
-        # elif key == "tag":
-        #     rows = session.query(File).filter(self.tag_filter(value)).all()
-        elif key == "name":
-            if not value:
-                log.error(
-                    "You need to specify a valid file name pattern (you can use wildcards)"
-                )
-                return None
-
-            if "*" in value:
-                value = value.replace("*", "%")
-            else:
-                value = f"%{value}%"
-
-            rows = session.query(File).filter(File.name.like(value)).all()
-        elif key == "note":
-            value = f"%{value}%"
-            rows = (
-                session.query(File).filter(File.note.any(Note.body.like(value))).all()
-            )
-        elif key == "type":
-            rows = session.query(File).filter(File.type.like(f"%{value}%")).all()
-        elif key == "mime":
-            rows = session.query(File).filter(File.mime.like(f"%{value}%")).all()
-        else:
-            log.error("No valid term specified")
-
-        return rows
-
-    def add_parent(self, file_sha256: str, parent_sha256: str) -> None:
-        session = self.session()
-
-        try:
-            file = session.query(File).filter(File.sha256 == file_sha256).first()
-            file.parent = (
-                session.query(File).filter(File.sha256 == parent_sha256).first()
-            )
-            session.commit()
-        except SQLAlchemyError as exc:
-            log.error(f"Unable to add parent: {exc}")
-            session.rollback()
-        finally:
-            session.close()
-
-    def delete_parent(self, file_sha256: str) -> None:
-        session = self.session()
-
-        try:
-            file = session.query(File).filter(File.sha256 == file_sha256).first()
-            file.parent = None
-            session.commit()
-        except SQLAlchemyError as exc:
-            log.error(f"Unable to delete parent: {exc}")
-            session.rollback()
-        finally:
-            session.close()
-
-    def get_parent(self, file_id: int) -> File:
-        session = self.session()
-        file = session.query(File).get(file_id)
-        if not file.parent_id:
-            return None
-
-        parent = session.query(File).get(file.parent_id)
-        return parent
-
-    def get_children(self, parent_id: int) -> str:
-        session = self.session()
-        children = session.query(File).filter(File.parent_id == parent_id).all()
-        child_samples = ""
-        for child in children:
-            child_samples += f"{child.sha256},"
-
-        return child_samples
-
-    def list_children(self, parent_id: str) -> list:
-        session = self.session()
-        children = session.query(File).filter(File.parent_id == parent_id).all()
-        return children
+    def __repr__(self):
+        return f"<{self.__class__.__name__}>"

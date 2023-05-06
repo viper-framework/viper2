@@ -21,7 +21,7 @@ class Store(Command):
             log.warning(f'Skip, file "{file_object.name}" appears to be already stored')
             return ""
 
-        status = Database().add(file_object=file_object, tags=tags)
+        status = Database().files.add(file_object=file_object)
         if not status:
             return ""
 
