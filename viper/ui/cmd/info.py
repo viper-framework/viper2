@@ -50,6 +50,6 @@ class Info(Command):
             print("")
 
             log.info(
-                "The following modules indicated they support analyzing this file:"
+                "The following modules support the analysis of this file:"
             )
             log.table({"columns": ["Module", "Description"], "rows": supported_modules})
