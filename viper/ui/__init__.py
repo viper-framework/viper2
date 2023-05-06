@@ -15,5 +15,5 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    shell = Shell()
+    shell = Shell(modules_path=args.modules)
     shell.run()

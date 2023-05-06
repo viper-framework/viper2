@@ -1,5 +1,6 @@
 import logging
 import shlex
+from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -7,8 +8,9 @@ from rich.console import Console
 
 from viper.core.projects import projects
 from viper.core.sessions import sessions
+from viper.core.modules import load_modules
 
-from .cmd import commands
+from .cmd import load_commands
 from .logger import init_logging
 from .logo import logo
 
@@ -18,9 +20,11 @@ log = logging.getLogger("viper")
 
 
 class Shell:
-    def __init__(self) -> None:
+    def __init__(self, modules_path: Optional[str] = "") -> None:
         self.__running = True
-        self.__commands = commands()
+        self.__commands = []
+        self.__modules_path = modules_path
+        self.__modules = []
 
     def __prompt(self) -> None:
         project_name = ""
@@ -52,8 +56,24 @@ class Shell:
         log.info("[bold]Commands:[/]")
         log.table({"columns": ["Command", "Description"], "rows": rows})
 
+        print("")
+
+        if len(self.__modules) == 0:
+            log.info("No modules available")
+            return
+
+        rows = []
+        for module_name, module_properties in self.__modules.items():
+            rows.append([module_name, module_properties["description"]])
+
+        log.info("[bold]Modules:[/]")
+        log.table({"columns": ["Module", "Description"], "rows": rows})
+
     def run(self) -> None:
         logo()
+
+        self.__commands = load_commands()
+        self.__modules = load_modules(self.__modules_path)
 
         session = PromptSession()
 
@@ -86,6 +106,11 @@ class Shell:
                 cmd = self.__commands[cmd_name]["class"]()
                 cmd.add_args(*cmd_args)
                 cmd.run()
+                continue
+
+            if cmd_name in self.__modules:
+                mod = self.__modules[cmd_name]["class"]()
+                mod.run()
                 continue
 
             log.error('No command or module found for "%s"', cmd_name)

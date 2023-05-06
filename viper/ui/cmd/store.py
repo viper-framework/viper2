@@ -4,9 +4,9 @@ from viper.common.file import FileObject
 from viper.core.database import Database
 from viper.core.sessions import sessions
 from viper.core.storage import Storage
+from viper.core.projects import projects
 
 from .command import Command
-from .projects import projects
 
 log = logging.getLogger("viper")
 

@@ -6,7 +6,7 @@ from .sessions import Sessions
 from .store import Store
 
 
-def commands():
+def load_commands():
     return {
         Close.cmd: {"class": Close, "description": Close.description},
         Info.cmd: {"class": Info, "description": Info.description},
