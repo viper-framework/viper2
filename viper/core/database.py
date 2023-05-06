@@ -191,7 +191,7 @@ class FileManager(BaseManager):
                     self.session.query(File).filter(File.md5 == file_object.md5).first()
                 )
             except SQLAlchemyError as exc:
-                log.error(f"Unable to store file: {exc}")
+                log.error("Unable to store file: %s", exc)
                 self.session.rollback()
                 return False
 
@@ -209,7 +209,7 @@ class FileManager(BaseManager):
             self.session.delete(file)
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to delete file: {exc}")
+            log.error("Unable to delete file: %s", exc)
             self.session.rollback()
             return False
         finally:
@@ -312,7 +312,7 @@ class FileManager(BaseManager):
             )
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to add parent: {exc}")
+            log.error("Unable to add parent: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()
@@ -323,7 +323,7 @@ class FileManager(BaseManager):
             file.parent = None
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to delete parent: {exc}")
+            log.error("Unable to delete parent: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()
@@ -408,18 +408,15 @@ class TagManager(BaseManager):
                 file_entry.tag.remove(tag)
                 self.session.commit()
             except Exception:
-                log.error(f"Tag {tag_name} does not exist for this sample")
+                log.error("Tag %s does not exist for this sample", tag_name)
 
-            # If tag has no entries drop it
+            # If tag has no entries drop it.
             count = len(self.find("tag", tag_name))
             if count == 0:
                 self.session.delete(tag)
                 self.session.commit()
-                log.warning(
-                    f"Tag {tag_name} has no additional entries dropping from Database"
-                )
         except SQLAlchemyError as exc:
-            log.error(f"Unable to delete tag: {exc}")
+            log.error("Unable to delete tag: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()
@@ -445,7 +442,7 @@ class NoteManager(BaseManager):
 
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to add note: {exc}")
+            log.error("Unable to add note: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()
@@ -458,7 +455,7 @@ class NoteManager(BaseManager):
             self.session.query(Note).get(note_id).body = body
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to update note: {exc}")
+            log.error("Unable to update note: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()
@@ -469,7 +466,7 @@ class NoteManager(BaseManager):
             self.session.delete(note)
             self.session.commit()
         except SQLAlchemyError as exc:
-            log.error(f"Unable to delete note: {exc}")
+            log.error("Unable to delete note: %s", exc)
             self.session.rollback()
         finally:
             self.session.close()

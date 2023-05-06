@@ -18,7 +18,9 @@ class Store(Command):
     def add_file(self, file_object: FileObject, tags=None) -> str:
         storage = Storage()
         if storage.get_file_path(projects.current.path, file_object.sha256):
-            log.warning(f'Skip, file "{file_object.name}" appears to be already stored')
+            log.warning(
+                'Skip, file "%s" appears to be already stored', file_object.name
+            )
             return ""
 
         status = Database().files.add(file_object=file_object)

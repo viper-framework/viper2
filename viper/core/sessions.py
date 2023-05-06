@@ -36,7 +36,8 @@ class Sessions:
         for session in self.__sessions:
             if session.file and session.file.path == file_path:
                 log.error(
-                    f"There is already a session open with file to path {session.file.path}"
+                    "There is already a session open with file to path %s",
+                    session.file.path,
                 )
                 return
 
@@ -48,7 +49,7 @@ class Sessions:
         self.current = session
 
         log.success(
-            f"New session opened to file {session.file.path} with ID {session.id}"
+            "New session opened to file %s with ID %d", session.file.path, session.id
         )
 
 

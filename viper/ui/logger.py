@@ -15,9 +15,9 @@ class ShellHandler(StreamHandler):
         console = Console()
 
         if record.levelno == logging.DEBUG:
-            console.print(record.msg)
+            console.print(record.getMessage())
         elif record.levelno == logging.INFO:
-            console.print(record.msg)
+            console.print(record.getMessage())
         elif record.levelno == logging.TABLE:
             table = Table(show_header=True, header_style="bold")
 
@@ -29,15 +29,15 @@ class ShellHandler(StreamHandler):
 
             console.print(table)
         elif record.levelno == logging.SUCCESS:
-            console.print(f"[green]{record.msg}[/]")
+            console.print(f"[green]{record.getMessage()}[/]")
         elif record.levelno == logging.WARNING:
-            console.print(f"[yellow]WARNING: {record.msg}[/]")
+            console.print(f"[yellow]WARNING: {record.getMessage()}[/]")
         elif record.levelno == logging.ERROR:
-            console.print(f"[red]ERROR: {record.msg}[/]")
+            console.print(f"[red]ERROR: {record.getMessage()}[/]")
         elif record.levelno == logging.CRITICAL:
-            console.print(f"[red]CRITICAL: {record.msg}[/]")
+            console.print(f"[red]CRITICAL: {record.getMessage()}[/]")
         elif record.levelno == logging.FATAL:
-            console.print(f"[red]FATAL: {record.msg}[/]")
+            console.print(f"[red]FATAL: {record.getMessage()}[/]")
 
 
 def init_logging() -> None:

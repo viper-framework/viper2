@@ -63,7 +63,7 @@ class Projects(Command):
             log.table({"columns": ["Project Name", "Creation Date"], "rows": rows})
         elif self.args.switch:
             projects.open(self.args.switch)
-            log.success(f"Switched to project with name {self.args.switch}")
+            log.success('Switched to project with name "%s"', self.args.switch)
         elif self.args.close:
             projects.close()
         elif self.args.delete:
@@ -79,9 +79,9 @@ class Projects(Command):
             for project_path in projects.list():
                 if os.path.basename(project_path) == self.args.delete:
                     shutil.rmtree(project_path)
-                    log.success(f"Successfully deleted project at path {project_path}")
+                    log.success("Successfully deleted project at path %s", project_path)
                     return
 
-            log.error(f"Could not find a project with name {self.args.delete}")
+            log.error('Could not find a project with name "%s"', self.args.delete)
         else:
             self.args_parser.print_usage()

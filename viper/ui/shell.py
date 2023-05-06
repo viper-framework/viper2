@@ -88,4 +88,4 @@ class Shell:
                 cmd.run()
                 continue
 
-            log.error(f'No command or module found for "{cmd_name}"')
+            log.error('No command or module found for "%s"', cmd_name)
