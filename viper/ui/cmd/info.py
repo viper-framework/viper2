@@ -1,5 +1,6 @@
 import logging
 
+from viper.core.modules import modules
 from viper.core.sessions import sessions
 
 from .command import Command
@@ -24,7 +25,7 @@ class Info(Command):
                     ["Tags", sessions.current.file.tags],
                     ["Path", sessions.current.file.path],
                     ["Size", str(sessions.current.file.size)],
-                    ["Type", sessions.current.file.type],
+                    ["Magic", sessions.current.file.magic],
                     ["Mime", sessions.current.file.mime],
                     ["MD5", sessions.current.file.md5],
                     ["SHA1", sessions.current.file.sha1],
@@ -37,3 +38,18 @@ class Info(Command):
                 ],
             },
         )
+
+        supported_modules = []
+        for module_name, module_properties in modules.items():
+            if module_properties["class"].supports_file(sessions.current.file):
+                supported_modules.append(
+                    [module_name, module_properties["description"]]
+                )
+
+        if len(supported_modules) > 0:
+            print("")
+
+            log.info(
+                "The following modules indicated they support analyzing this file:"
+            )
+            log.table({"columns": ["Module", "Description"], "rows": supported_modules})

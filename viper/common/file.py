@@ -2,6 +2,8 @@ import binascii
 import hashlib
 import os
 
+import magic
+
 
 # pylint: disable=too-many-instance-attributes
 class FileObject:
@@ -9,7 +11,7 @@ class FileObject:
         self.path = path
         self.name = ""
         self.size = 0
-        self.type = ""
+        self.magic = ""
         self.mime = ""
         self.md5 = ""
         self.sha1 = ""
@@ -24,6 +26,8 @@ class FileObject:
         if os.path.exists(self.path) and os.path.isfile(self.path):
             self.name = os.path.basename(self.path)
             self.size = os.path.getsize(self.path)
+            self.magic = magic.from_file(self.path)
+            self.mime = magic.from_file(self.path, mime=True)
             self.__hashes()
 
     @property

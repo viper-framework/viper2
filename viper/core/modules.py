@@ -8,17 +8,18 @@ import sys
 from viper.common.module import Module
 
 log = logging.getLogger("viper")
+modules = {}
 
 
-def load_modules(modules_path: str) -> dict:
+def load_modules(modules_path: str) -> None:
     if not modules_path:
-        return {}
+        return
 
     if not os.path.exists(modules_path):
         log.error("The modules directory does not exist at path: %s", modules_path)
-        return {}
+        return
 
-    modules = {}
+    global modules
     sys.path.insert(0, modules_path)
     for _, module_name, ispkg in pkgutil.iter_modules([modules_path]):
         if ispkg:
@@ -53,4 +54,3 @@ def load_modules(modules_path: str) -> dict:
                 }
 
     sys.path.remove(modules_path)
-    return modules

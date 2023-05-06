@@ -6,7 +6,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
 
-from viper.core.modules import load_modules
+from viper.core.modules import load_modules, modules
 from viper.core.projects import projects
 from viper.core.sessions import sessions
 
@@ -73,7 +73,8 @@ class Shell:
         logo()
 
         self.__commands = load_commands()
-        self.__modules = load_modules(self.__modules_path)
+        load_modules(self.__modules_path)
+        self.__modules = modules
 
         session = PromptSession()
 
