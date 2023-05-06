@@ -293,7 +293,9 @@ class FileManager(BaseManager):
             "sha256": self.session.query(File).filter(File.sha256 == value).all(),
             "name": self.get_files_by_name_pattern(value),
             "note": self.get_files_by_note_pattern(value),
-            "magic": self.session.query(File).filter(File.magic.like(f"%{value}%")).all(),
+            "magic": self.session.query(File)
+            .filter(File.magic.like(f"%{value}%"))
+            .all(),
             "mime": self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
         }
 

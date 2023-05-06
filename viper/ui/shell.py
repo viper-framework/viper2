@@ -2,9 +2,8 @@ import logging
 import shlex
 from typing import Optional
 
-from prompt_toolkit import PromptSession
+from prompt_toolkit import prompt
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from rich.console import Console
 
 from viper.core.modules import load_modules, modules
 from viper.core.projects import projects
@@ -27,19 +26,17 @@ class Shell:
         self.__modules = []
 
     def __prompt(self) -> None:
-        project_name = ""
+        text = []
         if not projects.current.is_default():
-            project_name = f"{projects.current.name} "
+            text.append(("bold ansicyan", f"{projects.current.name} "))
 
-        file_name = ""
+        text.append(("ansicyan", "viper "))
+
         if sessions.current:
-            file_name = sessions.current.file.name
+            text.append(("ansigray", sessions.current.file.name))
 
-        console = Console()
-        console.print(
-            f"[bold cyan]{project_name}[/][cyan]viper[/] [white]{file_name}[/][cyan]>[/] ",
-            end="",
-        )
+        text.append(("ansicyan", "> "))
+        return text
 
     def exit(self) -> None:
         log.info("Exiting...")
@@ -76,12 +73,12 @@ class Shell:
         load_modules(self.__modules_path)
         self.__modules = modules
 
-        session = PromptSession()
-
         while self.__running:
             try:
                 self.__prompt()
-                cmd_string = session.prompt(auto_suggest=AutoSuggestFromHistory())
+                cmd_string = prompt(
+                    self.__prompt(), auto_suggest=AutoSuggestFromHistory()
+                )
             except KeyboardInterrupt:
                 continue
             except EOFError:
