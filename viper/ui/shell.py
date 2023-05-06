@@ -2,7 +2,7 @@ import logging
 import shlex
 from typing import Optional
 
-from prompt_toolkit import prompt
+from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 from viper.core.modules import load_modules, modules
@@ -73,10 +73,12 @@ class Shell:
         load_modules(self.__modules_path)
         self.__modules = modules
 
+        session = PromptSession()
+
         while self.__running:
             try:
                 self.__prompt()
-                cmd_string = prompt(
+                cmd_string = session.prompt(
                     self.__prompt(), auto_suggest=AutoSuggestFromHistory()
                 )
             except KeyboardInterrupt:
