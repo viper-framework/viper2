@@ -1,9 +1,11 @@
 import logging
 import shlex
+import subprocess
 from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from rich.console import Console
 
 from viper.core.modules import load_modules, modules
 from viper.core.projects import projects
@@ -66,6 +68,14 @@ class Shell:
         log.info("[bold]Modules:[/]")
         log.table({"columns": ["Module", "Description"], "rows": rows})
 
+    def exec(self, cmd_name, cmd_args) -> None:
+        with subprocess.Popen(
+            [cmd_name] + cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as proc:
+            stdout, stderr = proc.communicate()
+            console = Console()
+            console.print(stdout.decode())
+
     def run(self) -> None:
         logo()
 
@@ -93,6 +103,10 @@ class Shell:
             cmd_words = shlex.split(cmd_string)
             cmd_name = cmd_words[0].lower().strip()
             cmd_args = cmd_words[1:]
+
+            if cmd_name.startswith("!"):
+                self.exec(cmd_name[1:], cmd_args)
+                continue
 
             if cmd_name in ("exit", "quit"):
                 self.exit()
