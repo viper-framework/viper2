@@ -5,6 +5,7 @@ from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.shortcuts import clear as prompt_clear
 from rich.console import Console
 
 from viper.core.database import Database
@@ -58,6 +59,7 @@ class Shell:
     def help(self) -> None:
         rows = [
             ["help", "Display this help message"],
+            ["clear", "Clear the screen"],
             ["exit, quit", "Exit from the Viper shell"],
         ]
         for cmd_name, cmd_properties in self.__commands.items():
@@ -78,6 +80,9 @@ class Shell:
 
         log.info("[bold]Modules:[/]")
         log.table({"columns": ["Module", "Description"], "rows": rows})
+
+    def clear(self) -> None:
+        prompt_clear()
 
     def exec(self, cmd_name, cmd_args) -> None:
         with subprocess.Popen(
@@ -125,6 +130,10 @@ class Shell:
 
             if cmd_name == "help":
                 self.help()
+                continue
+
+            if cmd_name == "clear":
+                self.clear()
                 continue
 
             if cmd_name in self.__commands:
