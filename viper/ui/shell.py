@@ -7,6 +7,7 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from rich.console import Console
 
+from viper.core.database import Database
 from viper.core.modules import load_modules, modules
 from viper.core.projects import projects
 from viper.core.sessions import sessions
@@ -26,6 +27,16 @@ class Shell:
         self.__commands = []
         self.__modules_path = modules_path
         self.__modules = []
+
+    def __welcome(self) -> None:
+        logo()
+
+        db = Database()
+        log.info(
+            "[magenta]You have [bold]%d[/] files in your [bold]%s[/] project[/]",
+            db.files.total(),
+            projects.current.name,
+        )
 
     def __prompt(self) -> None:
         text = []
@@ -77,7 +88,7 @@ class Shell:
             console.print(stdout.decode())
 
     def run(self) -> None:
-        logo()
+        self.__welcome()
 
         self.__commands = load_commands()
         load_modules(self.__modules_path)

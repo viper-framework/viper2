@@ -217,7 +217,7 @@ class FileManager(BaseManager):
 
         return True
 
-    def get_latest_files(self, limit: int = 5, offset: int = 0) -> list:
+    def get_latest_files(self, offset: int = 0, limit: int = 5) -> tuple:
         try:
             limit = int(limit)
         except ValueError:
@@ -234,7 +234,7 @@ class FileManager(BaseManager):
 
         return rows
 
-    def get_files_by_name_pattern(self, name_pattern: str) -> list:
+    def get_files_by_name_pattern(self, name_pattern: str) -> tuple:
         if not name_pattern:
             log.error(
                 "You need to specify a valid file name pattern (you can use wildcards)"
@@ -250,8 +250,8 @@ class FileManager(BaseManager):
         return rows
 
     def get_files_by_note_pattern(
-        self, pattern: str, offset: Optional[int] = 0, limit: Optional[int] = None
-    ) -> list:
+        self, pattern: str, offset: int = 0, limit: int = None
+    ) -> tuple:
         offset = int(offset)
         limit = limit or 10
         pattern = f"%{pattern}%"
@@ -269,40 +269,54 @@ class FileManager(BaseManager):
 
         return rows
 
-    def find(
-        self, key: str, value: Optional[str] = None, offset: Optional[int] = 0
-    ) -> list:
-        queries = {
-            "all": self.session.query(File).options(subqueryload(File.tag)).all(),
-            "ssdeep": self.session.query(File)
-            .filter(File.ssdeep.contains(str(value)))
-            .all(),
-            "any": self.session.query(File)
-            .filter(
-                File.name.startswith(str(value))
-                | File.md5.startswith(str(value))
-                | File.sha1.startswith(str(value))
-                | File.sha256.startswith(str(value))
-                | File.magic.contains(str(value))
-                | File.mime.contains(str(value))
-            )
-            .all(),
-            "latest": self.get_latest_files(value, offset),
-            "md5": self.session.query(File).filter(File.md5 == value).all(),
-            "sha1": self.session.query(File).filter(File.sha1 == value).all(),
-            "sha256": self.session.query(File).filter(File.sha256 == value).all(),
-            "name": self.get_files_by_name_pattern(value),
-            "note": self.get_files_by_note_pattern(value),
-            "magic": self.session.query(File)
-            .filter(File.magic.like(f"%{value}%"))
-            .all(),
-            "mime": self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
-        }
+    def total(self) -> int:
+        return self.session.query(File.id).count()
 
-        rows = queries.get(key)
-        if rows is None:
+    def find(self, key: str, value: Optional[str] = None, offset: int = 0) -> tuple:
+        rows = None
+        if key == "all":
+            rows = (self.session.query(File).options(subqueryload(File.tag)).all(),)
+        elif key == "ssdeep":
+            rows = (
+                self.session.query(File).filter(File.ssdeep.contains(str(value))).all(),
+            )
+        elif key == "any":
+            rows = (
+                self.session.query(File)
+                .filter(
+                    File.name.startswith(str(value))
+                    | File.md5.startswith(str(value))
+                    | File.sha1.startswith(str(value))
+                    | File.sha256.startswith(str(value))
+                    | File.magic.contains(str(value))
+                    | File.mime.contains(str(value))
+                )
+                .all(),
+            )
+        elif key == "latest":
+            self.get_latest_files(value, offset),
+        elif key == "md5":
+            rows = (self.session.query(File).filter(File.md5 == value).all(),)
+        elif key == "sha1":
+            rows = (self.session.query(File).filter(File.sha1 == value).all(),)
+        elif key == "sha256":
+            rows = (self.session.query(File).filter(File.sha256 == value).all(),)
+        elif key == "name":
+            rows = (self.get_files_by_name_pattern(value),)
+        elif key == "note":
+            rows = (self.get_files_by_note_pattern(value),)
+        elif key == "magic":
+            rows = (
+                self.session.query(File).filter(File.magic.like(f"%{value}%")).all(),
+            )
+        elif key == "mime":
+            rows = (
+                self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
+            )
+
+        if not rows:
             log.error("No valid term specified")
-            return []
+            return ()
 
         return rows
 
@@ -346,7 +360,7 @@ class FileManager(BaseManager):
 
         return child_samples
 
-    def list_children(self, parent_id: str) -> list:
+    def list_children(self, parent_id: str) -> tuple:
         children = self.session.query(File).filter(File.parent_id == parent_id).all()
         return children
 
@@ -385,11 +399,11 @@ class TagManager(BaseManager):
                 except SQLAlchemyError:
                     self.session.rollback()
 
-    def list_tags(self) -> list:
+    def list_tags(self) -> tuple:
         rows = self.session.query(Tag).all()
         return rows
 
-    def list_tags_for_file(self, sha256: str) -> list:
+    def list_tags_for_file(self, sha256: str) -> tuple:
         file = (
             self.session.query(File)
             .options(subqueryload(File.tag))
@@ -425,7 +439,7 @@ class TagManager(BaseManager):
 
 
 class NoteManager(BaseManager):
-    def list_notes(self) -> list:
+    def list_notes(self) -> tuple:
         rows = self.session.query(Note).all()
         return rows
 
