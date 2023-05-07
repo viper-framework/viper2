@@ -15,7 +15,7 @@ class Open(Command):
     def __init__(self) -> None:
         super().__init__()
         self.args_parser.add_argument(
-            "--file", "-f", action="store", help="Open the file specified at path"
+            "-f", "--file", action="store", help="open the file specified at path"
         )
 
     def run(self) -> None:

@@ -49,7 +49,5 @@ class Info(Command):
         if len(supported_modules) > 0:
             print("")
 
-            log.info(
-                "The following modules support the analysis of this file:"
-            )
+            log.info("The following modules support the analysis of this file:")
             log.table({"columns": ["Module", "Description"], "rows": supported_modules})

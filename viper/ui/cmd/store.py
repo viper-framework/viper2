@@ -6,7 +6,7 @@ from viper.core.projects import projects
 from viper.core.sessions import sessions
 from viper.core.storage import Storage
 
-from .command import Command
+from .command import Command, CommandRunError
 
 log = logging.getLogger("viper")
 
@@ -37,7 +37,10 @@ class Store(Command):
         return new_path
 
     def run(self) -> None:
-        super().run()
+        try:
+            super().run()
+        except CommandRunError:
+            return
 
         if not sessions.current:
             log.error("This command expects a session to a file to be open")

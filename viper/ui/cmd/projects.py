@@ -21,25 +21,25 @@ class Projects(Command):
 
         group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
-            "-l", "--list", action="store_true", help="List all existing projects"
+            "-l", "--list", action="store_true", help="list all existing projects"
         )
         group.add_argument(
             "-s",
             "--switch",
             metavar="PROJECT NAME",
-            help="Switch to the specified project (create one if it doesn't exist)",
+            help="switch to the specified project (create one if it doesn't exist)",
         )
         group.add_argument(
             "-c",
             "--close",
             action="store_true",
-            help="Close the currently open project",
+            help="close the currently open project",
         )
         group.add_argument(
             "-d",
             "--delete",
             metavar="PROJECT NAME",
-            help="Delete the specified project",
+            help="delete the specified project",
         )
 
     def run(self) -> None:

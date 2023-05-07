@@ -15,10 +15,10 @@ class Sessions(Command):
         super().__init__()
         group = self.args_parser.add_mutually_exclusive_group()
         group.add_argument(
-            "-l", "--list", action="store_true", help="List all existing sessions"
+            "-l", "--list", action="store_true", help="list all existing sessions"
         )
         group.add_argument(
-            "-s", "--switch", type=int, help="Switch to the specified session"
+            "-s", "--switch", type=int, help="switch to the specified session"
         )
 
     def __list(self) -> None:
