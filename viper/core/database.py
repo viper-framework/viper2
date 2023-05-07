@@ -216,7 +216,7 @@ class FileManager(BaseManager):
 
         return True
 
-    def get_latest_files(self, offset: int = 0, limit: int = 5) -> tuple:
+    def get_latest_files(self, offset: int = 0, limit: int = 5) -> list:
         try:
             limit = int(limit)
         except ValueError:
@@ -233,7 +233,7 @@ class FileManager(BaseManager):
 
         return rows
 
-    def get_files_by_name_pattern(self, name_pattern: str) -> tuple:
+    def get_files_by_name_pattern(self, name_pattern: str) -> list:
         if not name_pattern:
             log.error(
                 "You need to specify a valid file name pattern (you can use wildcards)"
@@ -250,7 +250,7 @@ class FileManager(BaseManager):
 
     def get_files_by_note_pattern(
         self, pattern: str, offset: int = 0, limit: int = None
-    ) -> tuple:
+    ) -> list:
         offset = int(offset)
         limit = limit or 10
         pattern = f"%{pattern}%"
@@ -355,7 +355,7 @@ class FileManager(BaseManager):
 
         return child_samples
 
-    def list_children(self, parent_id: str) -> tuple:
+    def list_children(self, parent_id: str) -> list:
         children = self.session.query(File).filter(File.parent_id == parent_id).all()
         return children
 
@@ -394,11 +394,11 @@ class TagManager(BaseManager):
                 except SQLAlchemyError:
                     self.session.rollback()
 
-    def list_tags(self) -> tuple:
+    def list_tags(self) -> list:
         rows = self.session.query(Tag).all()
         return rows
 
-    def list_tags_for_file(self, sha256: str) -> tuple:
+    def list_tags_for_file(self, sha256: str) -> list:
         file = (
             self.session.query(File)
             .options(subqueryload(File.tag))
@@ -434,7 +434,7 @@ class TagManager(BaseManager):
 
 
 class NoteManager(BaseManager):
-    def list_notes(self) -> tuple:
+    def list_notes(self) -> list:
         rows = self.session.query(Note).all()
         return rows
 
