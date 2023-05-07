@@ -1,7 +1,9 @@
 import logging
 import os
 
+from viper.core.projects import projects
 from viper.core.sessions import sessions
+from viper.core.storage import Storage
 
 from .command import Command, CommandRunError
 
@@ -16,6 +18,12 @@ class Open(Command):
         super().__init__()
         self.args_parser.add_argument(
             "-f", "--file", action="store", help="open the file specified at path"
+        )
+        self.args_parser.add_argument(
+            "-l",
+            "--last",
+            action="store",
+            help="# of a result from the last `find` command",
         )
 
     def run(self) -> None:
@@ -32,6 +40,14 @@ class Open(Command):
                 return
 
             sessions.new(self.args.file)
-            return
+        elif self.args.last:
+            for idx, entry in enumerate(sessions.get_find(), start=1):
+                if idx == int(self.args.last):
+                    sessions.new(
+                        Storage().get_file_path(projects.current.path, entry.sha256)
+                    )
+                    return
 
-        self.args_parser.print_usage()
+            log.error("Did not find a last find entry with the provided #")
+        else:
+            self.args_parser.print_usage()

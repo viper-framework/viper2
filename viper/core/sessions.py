@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 import time
 
 from viper.common.file import FileObject
@@ -22,6 +23,19 @@ class Sessions:
         self.current = None
         self.__sessions = []
 
+        # This is used to keep trace of the results from the last "find" command
+        # so we can reference them in other commands (primarily "open").
+        # TODO: However, this is not really the optimal place for this, as
+        #       this class is intended only to keep track of currently open
+        #       files. Find results are a little off-spec.
+        self.__last_find = []
+
+    def add_find(self, results: list) -> None:
+        self.__last_find = results
+
+    def get_find(self) -> list:
+        return self.__last_find
+
     def list(self) -> list:
         return self.__sessions
 
@@ -40,6 +54,10 @@ class Sessions:
                     session.file.path,
                 )
                 return
+
+        if not os.path.exists(file_object.path):
+            log.error("File does not exist at path %s", file_object.path)
+            return
 
         session = Session()
         session.id = len(self.__sessions) + 1

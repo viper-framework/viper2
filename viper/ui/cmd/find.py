@@ -1,6 +1,7 @@
 import logging
 
 from viper.core.database import Database
+from viper.core.sessions import sessions
 
 from .command import Command, CommandRunError
 
@@ -43,6 +44,11 @@ class Find(Command):
 
         db = Database()
         files = db.files.find(key=self.args.key, value=self.args.value)
+        if len(files) == 0:
+            log.info("No matching results")
+            return
+
+        sessions.add_find(files)
 
         rows = []
         counter = 1

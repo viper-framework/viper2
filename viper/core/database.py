@@ -308,10 +308,9 @@ class FileManager(BaseManager):
             rows = self.session.query(File).filter(File.magic.like(f"%{value}%")).all()
         elif key == "mime":
             rows = self.session.query(File).filter(File.mime.like(f"%{value}%")).all()
-
-        if not rows:
+        else:
             log.error("No valid term specified")
-            return ()
+            return []
 
         return rows
 
