@@ -158,42 +158,41 @@ class FileManager(BaseManager):
         self,
         file_object: FileObject,
         name: Optional[str] = None,
-        parent_sha: Optional[str] = None,
+        parent_sha256: Optional[str] = None,
     ) -> bool:
         if not name:
             name = file_object.name
 
-        if parent_sha:
-            parent_sha = (
-                self.session.query(File).filter(File.sha256 == parent_sha).first()
+        if parent_sha256:
+            parent_sha256 = (
+                self.session.query(File).filter(File.sha256 == parent_sha256).first()
             )
 
-        if isinstance(file_object, FileObject):
-            try:
-                file_entry = File(
-                    md5=file_object.md5,
-                    crc32=file_object.crc32,
-                    sha1=file_object.sha1,
-                    sha256=file_object.sha256,
-                    sha512=file_object.sha512,
-                    size=file_object.size,
-                    magic=file_object.magic,
-                    mime=file_object.mime,
-                    ssdeep=file_object.ssdeep,
-                    name=name,
-                    parent=parent_sha,
-                )
-                self.session.add(file_entry)
-                self.session.commit()
-            except IntegrityError:
-                self.session.rollback()
-                file_entry = (
-                    self.session.query(File).filter(File.md5 == file_object.md5).first()
-                )
-            except SQLAlchemyError as exc:
-                log.error("Unable to store file: %s", exc)
-                self.session.rollback()
-                return False
+        try:
+            file_entry = File(
+                md5=file_object.md5,
+                crc32=file_object.crc32,
+                sha1=file_object.sha1,
+                sha256=file_object.sha256,
+                sha512=file_object.sha512,
+                size=file_object.size,
+                magic=file_object.magic,
+                mime=file_object.mime,
+                ssdeep=file_object.ssdeep,
+                name=name,
+                parent=parent_sha256,
+            )
+            self.session.add(file_entry)
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+            file_entry = (
+                self.session.query(File).filter(File.md5 == file_object.md5).first()
+            )
+        except SQLAlchemyError as exc:
+            log.error("Unable to store file: %s", exc)
+            self.session.rollback()
+            return False
 
         return True
 
@@ -272,13 +271,13 @@ class FileManager(BaseManager):
     def total(self) -> int:
         return self.session.query(File.id).count()
 
-    def find(self, key: str, value: Optional[str] = None, offset: int = 0) -> tuple:
-        rows = None
+    def find(self, key: str, value: Optional[str] = None, offset: int = 0) -> list:
+        rows = []
         if key == "all":
-            rows = (self.session.query(File).options(subqueryload(File.tag)).all(),)
+            rows = self.session.query(File).options(subqueryload(File.tag)).all()
         elif key == "ssdeep":
             rows = (
-                self.session.query(File).filter(File.ssdeep.contains(str(value))).all(),
+                self.session.query(File).filter(File.ssdeep.contains(str(value))).all()
             )
         elif key == "any":
             rows = (
@@ -291,28 +290,24 @@ class FileManager(BaseManager):
                     | File.magic.contains(str(value))
                     | File.mime.contains(str(value))
                 )
-                .all(),
+                .all()
             )
         elif key == "latest":
             self.get_latest_files(value, offset),
         elif key == "md5":
-            rows = (self.session.query(File).filter(File.md5 == value).all(),)
+            rows = self.session.query(File).filter(File.md5 == value).all()
         elif key == "sha1":
-            rows = (self.session.query(File).filter(File.sha1 == value).all(),)
+            rows = self.session.query(File).filter(File.sha1 == value).all()
         elif key == "sha256":
-            rows = (self.session.query(File).filter(File.sha256 == value).all(),)
+            rows = self.session.query(File).filter(File.sha256 == value).all()
         elif key == "name":
-            rows = (self.get_files_by_name_pattern(value),)
+            rows = self.get_files_by_name_pattern(value)
         elif key == "note":
-            rows = (self.get_files_by_note_pattern(value),)
+            rows = self.get_files_by_note_pattern(value)
         elif key == "magic":
-            rows = (
-                self.session.query(File).filter(File.magic.like(f"%{value}%")).all(),
-            )
+            rows = self.session.query(File).filter(File.magic.like(f"%{value}%")).all()
         elif key == "mime":
-            rows = (
-                self.session.query(File).filter(File.mime.like(f"%{value}%")).all(),
-            )
+            rows = self.session.query(File).filter(File.mime.like(f"%{value}%")).all()
 
         if not rows:
             log.error("No valid term specified")
