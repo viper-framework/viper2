@@ -42,6 +42,10 @@ class Sessions:
     def close(self) -> None:
         self.current = None
 
+    def reset(self) -> None:
+        self.close()
+        self.__sessions = []
+
     def switch(self, session: Session) -> None:
         self.current = session
 

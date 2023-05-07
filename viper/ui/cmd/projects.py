@@ -5,6 +5,7 @@ import time
 
 from prompt_toolkit.shortcuts import confirm
 
+from viper.core.sessions import sessions
 from viper.core.projects import projects
 
 from .command import Command, CommandRunError
@@ -62,9 +63,15 @@ class Projects(Command):
 
             log.table({"columns": ["Project Name", "Creation Date"], "rows": rows})
         elif self.args.switch:
+            # When we switch project, we reset sessions so that any previously
+            # open sessions are closed and removed.
+            sessions.reset()
             projects.open(self.args.switch)
             log.success('Switched to project with name "%s"', self.args.switch)
         elif self.args.close:
+            # Similarly to switch, if we close the current project, we should
+            # also close all active sessions.
+            sessions.reset()
             projects.close()
         elif self.args.delete:
             delete = confirm(
