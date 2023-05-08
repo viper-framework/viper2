@@ -3,12 +3,40 @@ import inspect
 import logging
 import os
 import pkgutil
+import shutil
 import sys
+import tempfile
+
+from pipreqs import pipreqs
 
 from viper.common.module import Module
 
 log = logging.getLogger("viper")
 modules = {}
+
+
+def get_module_dependencies(module_path: str) -> list:
+    if not os.path.exists(module_path):
+        return []
+
+    imports = []
+    with tempfile.TemporaryDirectory() as temp_dir:
+        shutil.copy(module_path, os.path.join(temp_dir, os.path.basename(module_path)))
+        imports = pipreqs.get_all_imports(temp_dir)
+
+    return imports
+
+
+def have_dependency(dependency: str) -> bool:
+    if dependency == "viper":
+        return True
+
+    try:
+        importlib.import_module(dependency)
+    except ModuleNotFoundError:
+        return False
+
+    return True
 
 
 def load_modules(modules_path: str) -> None:
@@ -25,10 +53,26 @@ def load_modules(modules_path: str) -> None:
         if ispkg:
             continue
 
+        module_path = os.path.join(modules_path, f"{module_name}.py")
+        dependencies = get_module_dependencies(module_path)
+        can_load = True
+        for dep in dependencies:
+            if not have_dependency(dep):
+                can_load = False
+                log.error(
+                    "Module at path %s requires the following missing library: '%s'",
+                    module_path,
+                    dep,
+                )
+
+        if not can_load:
+            log.error("Cannot proceed importing module '%s'", module_name)
+            continue
+
         try:
             module = importlib.import_module(module_name)
         except ImportError as exc:
-            log.error('Failed to import module with name "%s": %s', module_name, exc)
+            log.error("Failed to import module with name '%s': %s", module_name, exc)
             continue
 
         for member_name, member_object in inspect.getmembers(module):
