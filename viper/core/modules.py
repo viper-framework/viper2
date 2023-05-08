@@ -55,17 +55,17 @@ def load_modules(modules_path: str) -> None:
 
         module_path = os.path.join(modules_path, f"{module_name}.py")
         dependencies = get_module_dependencies(module_path)
-        can_load = True
+        can_import = True
         for dep in dependencies:
             if not have_dependency(dep):
-                can_load = False
+                can_import = False
                 log.error(
                     "Module at path %s requires the following missing library: '%s'",
                     module_path,
                     dep,
                 )
 
-        if not can_load:
+        if not can_import:
             log.error("Cannot proceed importing module '%s'", module_name)
             continue
 
