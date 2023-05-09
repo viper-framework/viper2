@@ -36,24 +36,28 @@ def main() -> None:
         "-m",
         "--modules",
         action="store",
+        metavar="MODULES_PATH",
         help="path to a folder containing Viper modules to load",
     )
     parser.add_argument(
         "-p",
         "--project",
         action="store",
+        metavar="PROJECT_NAME",
         help="open a project",
     )
     parser.add_argument(
         "-o",
         "--open",
         action="store",
+        metavar="FILE_PATH",
         help="open a file",
     )
     parser.add_argument(
         "-r",
         "--run",
         action="store",
+        metavar="COMMAND",
         help="run a command or module instead of opening the shell",
     )
     args = parser.parse_args()
