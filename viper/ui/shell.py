@@ -14,10 +14,7 @@ from viper.core.projects import projects
 from viper.core.sessions import sessions
 
 from .cmd import load_commands
-from .logger import init_logging
 from .logo import logo
-
-init_logging()
 
 log = logging.getLogger("viper")
 
