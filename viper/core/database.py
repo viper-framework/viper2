@@ -19,8 +19,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship, sessionmaker, subqueryload
 from sqlalchemy.pool import NullPool
 
-from viper.common.file import FileObject
-from viper.core.projects import projects
+from ..common.file import FileObject
+from .projects import projects
 
 log = logging.getLogger("viper")
 

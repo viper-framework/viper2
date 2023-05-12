@@ -3,7 +3,7 @@ import logging
 import os
 import time
 
-from viper.common.file import FileObject
+from ..common.file import FileObject
 
 log = logging.getLogger("viper")
 

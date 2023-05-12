@@ -1,7 +1,7 @@
 from typing import Any
 
-from viper.common.arguments import ArgumentError, ArgumentParser
-from viper.common.file import FileObject
+from .arguments import ArgumentError, ArgumentParser
+from .file import FileObject
 
 
 class ModuleRunError(Exception):

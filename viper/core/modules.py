@@ -9,7 +9,7 @@ import tempfile
 
 from pipreqs import pipreqs
 
-from viper.common.module import Module
+from ..common.module import Module
 
 log = logging.getLogger("viper")
 modules = {}
