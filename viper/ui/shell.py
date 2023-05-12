@@ -1,7 +1,6 @@
 import logging
 import shlex
 import subprocess
-from typing import Optional
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -20,7 +19,7 @@ log = logging.getLogger("viper")
 
 
 class Shell:
-    def __init__(self, modules_path: Optional[str] = "") -> None:
+    def __init__(self, modules_path: str = "") -> None:
         self.__running = True
         self.__commands = []
         self.__modules_path = modules_path
@@ -36,7 +35,7 @@ class Shell:
             projects.current.name,
         )
 
-    def __prompt(self) -> None:
+    def __prompt(self) -> str:
         text = []
         if not projects.current.is_default():
             text.append(("bold ansicyan", f"{projects.current.name} "))
