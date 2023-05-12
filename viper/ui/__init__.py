@@ -2,10 +2,9 @@ import argparse
 import logging
 import shlex
 
-from viper.core.modules import load_modules, modules
-from viper.core.projects import projects
-from viper.core.sessions import sessions
-
+from ..core.modules import load_modules, modules
+from ..core.projects import projects
+from ..core.sessions import sessions
 from .logger import init_logging
 from .shell import Shell
 

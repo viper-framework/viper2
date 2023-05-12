@@ -1,6 +1,6 @@
 from rich.console import Console
 
-from viper.common.version import VIPER_VERSION
+from ..common.version import VIPER_VERSION
 
 
 def logo():

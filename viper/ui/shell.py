@@ -1,17 +1,17 @@
 import logging
 import shlex
 import subprocess
+from typing import List
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.shortcuts import clear as prompt_clear
 from rich.console import Console
 
-from viper.core.database import Database
-from viper.core.modules import load_modules, modules
-from viper.core.projects import projects
-from viper.core.sessions import sessions
-
+from ..core.database import Database
+from ..core.modules import load_modules, modules
+from ..core.projects import projects
+from ..core.sessions import sessions
 from .cmd import load_commands
 from .logo import logo
 
@@ -21,9 +21,9 @@ log = logging.getLogger("viper")
 class Shell:
     def __init__(self, modules_path: str = "") -> None:
         self.__running = True
-        self.__commands = []
+        self.__commands: dict = {}
         self.__modules_path = modules_path
-        self.__modules = []
+        self.__modules: dict = {}
 
     def __welcome(self) -> None:
         logo()

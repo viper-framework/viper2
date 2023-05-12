@@ -1,4 +1,5 @@
-from typing import Any
+from argparse import Namespace
+from typing import Any, Tuple
 
 from viper.common.arguments import ArgumentError, ArgumentParser
 
@@ -12,8 +13,8 @@ class Command:
     description = ""
 
     def __init__(self) -> None:
-        self.args = None
-        self.__args_input = None
+        self.args: Namespace
+        self.__args_input: Tuple[Any, ...]
         self.args_parser = ArgumentParser(prog=self.cmd, description=self.description)
 
     def add_args(self, *args: Any) -> None:

@@ -249,7 +249,7 @@ class FileManager(BaseManager):
         return rows
 
     def get_files_by_note_pattern(
-        self, pattern: str, offset: int = 0, limit: int = None
+        self, pattern: str, offset: int = 0, limit: int = 0
     ) -> list:
         offset = int(offset)
         limit = limit or 10
@@ -338,7 +338,7 @@ class FileManager(BaseManager):
         finally:
             self.session.close()
 
-    def get_parent(self, file_id: int) -> File:
+    def get_parent(self, file_id: int) -> Optional[File]:
         file = self.session.query(File).get(file_id)
         if not file.parent_id:
             return None

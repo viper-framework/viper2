@@ -7,7 +7,7 @@ from .sessions import Sessions
 from .store import Store
 
 
-def load_commands():
+def load_commands() -> dict:
     return {
         Close.cmd: {"class": Close, "description": Close.description},
         Info.cmd: {"class": Info, "description": Info.description},

@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import time
+from typing import List, Optional
 
 from ..common.file import FileObject
 
@@ -11,8 +12,8 @@ log = logging.getLogger("viper")
 # pylint: disable=too-few-public-methods
 class Session:
     def __init__(self) -> None:
-        self.id = None  # pylint: disable=invalid-name
-        self.file = None
+        self.id: int  # pylint: disable=invalid-name
+        self.file: FileObject
         self.created_at = datetime.datetime.fromtimestamp(time.time()).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
@@ -20,8 +21,8 @@ class Session:
 
 class Sessions:
     def __init__(self) -> None:
-        self.current = None
-        self.__sessions = []
+        self.current: Optional[Session] = None
+        self.__sessions: List[Session] = []
 
         # This is used to keep trace of the results from the last "find" command
         # so we can reference them in other commands (primarily "open").
