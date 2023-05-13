@@ -12,7 +12,7 @@ log = logging.getLogger("viper")
 # pylint: disable=too-few-public-methods
 class Session:
     def __init__(self) -> None:
-        self.id: int  # pylint: disable=invalid-name
+        self.identifier: int
         self.file: FileObject
         self.created_at = datetime.datetime.fromtimestamp(time.time()).strftime(
             "%Y-%m-%d %H:%M:%S"
@@ -65,14 +65,16 @@ class Sessions:
             return
 
         session = Session()
-        session.id = len(self.__sessions) + 1
+        session.identifier = len(self.__sessions) + 1
         session.file = file_object
 
         self.__sessions.append(session)
         self.current = session
 
         log.success(
-            "New session opened to file %s with ID %d", session.file.path, session.id
+            "New session opened to file %s with ID %d",
+            session.file.path,
+            session.identifier,
         )
 
 

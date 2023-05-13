@@ -34,7 +34,7 @@ class Sessions(Command):
 
             rows.append(
                 [
-                    str(session.id),
+                    str(session.identifier),
                     session.file.name,
                     session.file.sha1,
                     session.created_at,
@@ -50,9 +50,9 @@ class Sessions(Command):
             },
         )
 
-    def __switch(self, session_id: int) -> None:
+    def __switch(self, identifier: int) -> None:
         for session in sessions.list():
-            if session_id == session.id:
+            if identifier == session.identifier:
                 sessions.switch(session)
                 return
 
