@@ -1,7 +1,7 @@
 import logging
 
-from viper.core.database import Database
-from viper.core.sessions import sessions
+from viper2.core.database import Database
+from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
 

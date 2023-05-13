@@ -5,8 +5,8 @@ import time
 
 from prompt_toolkit.shortcuts import confirm
 
-from viper.core.projects import projects
-from viper.core.sessions import sessions
+from viper2.core.projects import projects
+from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
 

@@ -1,7 +1,7 @@
 from argparse import Namespace
 from typing import Any, Tuple
 
-from viper.common.arguments import ArgumentError, ArgumentParser
+from viper2.common.arguments import ArgumentError, ArgumentParser
 
 
 class CommandRunError(Exception):

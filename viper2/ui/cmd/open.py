@@ -1,9 +1,9 @@
 import logging
 import os
 
-from viper.core.projects import projects
-from viper.core.sessions import sessions
-from viper.core.storage import Storage
+from viper2.core.projects import projects
+from viper2.core.sessions import sessions
+from viper2.core.storage import Storage
 
 from .command import Command, CommandRunError
 

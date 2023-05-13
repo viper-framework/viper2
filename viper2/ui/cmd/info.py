@@ -1,7 +1,7 @@
 import logging
 
-from viper.core.modules import modules
-from viper.core.sessions import sessions
+from viper2.core.modules import modules
+from viper2.core.sessions import sessions
 
 from .command import Command
 

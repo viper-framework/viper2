@@ -1,4 +1,4 @@
-from viper.core.sessions import sessions
+from viper2.core.sessions import sessions
 
 from .command import Command
 

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-export SOURCE="viper"
+export SOURCE="viper2"
 
 export PREFIX=""
 if [ -d 'venv' ] ; then
