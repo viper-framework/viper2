@@ -196,9 +196,9 @@ class FileManager(BaseManager):
 
         return True
 
-    def delete_file(self, id: int) -> bool:
+    def delete_file(self, file_id: int) -> bool:
         try:
-            file = self.session.query(File).get(id)
+            file = self.session.query(File).get(file_id)
             if not file:
                 log.error(
                     "The open file doesn't appear to be in the database, have you stored it yet?"

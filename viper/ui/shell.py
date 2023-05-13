@@ -1,7 +1,6 @@
 import logging
 import shlex
 import subprocess
-from typing import List
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -20,9 +19,9 @@ log = logging.getLogger("viper")
 
 class Shell:
     def __init__(self, modules_path: str = "") -> None:
-        self.__running = True
+        self.__running: bool = True
         self.__commands: dict = {}
-        self.__modules_path = modules_path
+        self.__modules_path: str = modules_path
         self.__modules: dict = {}
 
     def __welcome(self) -> None:
@@ -81,10 +80,8 @@ class Shell:
         prompt_clear()
 
     def exec(self, cmd_name, cmd_args) -> None:
-        with subprocess.Popen(
-            [cmd_name] + cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        ) as proc:
-            stdout, stderr = proc.communicate()
+        with subprocess.Popen([cmd_name] + cmd_args, stdout=subprocess.PIPE) as proc:
+            stdout, _ = proc.communicate()
             console = Console()
             console.print(stdout.decode())
 
@@ -95,7 +92,7 @@ class Shell:
         load_modules(self.__modules_path)
         self.__modules = modules
 
-        session = PromptSession()
+        session: PromptSession = PromptSession()
 
         while self.__running:
             try:

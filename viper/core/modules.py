@@ -47,7 +47,6 @@ def load_modules(modules_path: str) -> None:
         log.error("The modules directory does not exist at path: %s", modules_path)
         return
 
-    global modules
     sys.path.insert(0, modules_path)
     for _, module_name, ispkg in pkgutil.iter_modules([modules_path]):
         if ispkg:
