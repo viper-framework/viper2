@@ -32,7 +32,7 @@ class Tags(Command):
             return
 
         try:
-            File.get(File.sha256 == sessions.current.file.sha256)
+            file = File.get(File.sha256 == sessions.current.file.sha256)
         except File.DoesNotExist:  # pylint: disable=no-member
             log.error(
                 'The currently open file is not stored in the database, use "store" command first'
@@ -40,9 +40,7 @@ class Tags(Command):
             return
 
         for tag in tags:
-            tag = Tag(
-                name=tag, file=File.get(File.sha256 == sessions.current.file.sha256)
-            )
+            tag = Tag(name=tag, file=file)
             tag.save()
 
     def run(self) -> None:
