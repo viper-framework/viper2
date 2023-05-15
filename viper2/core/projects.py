@@ -1,6 +1,7 @@
 import logging
 import os
 
+from .database import init_db
 from .storage import Storage
 
 log = logging.getLogger("viper")
@@ -19,6 +20,8 @@ class Project:
 
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+
+        init_db(os.path.join(self.path, "viper.db"))
 
     def is_default(self) -> bool:
         if self.name == PROJECT_DEFAULT:

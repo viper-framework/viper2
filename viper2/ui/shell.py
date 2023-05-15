@@ -7,7 +7,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.shortcuts import clear as prompt_clear
 from rich.console import Console
 
-from ..core.database import Database
+from ..core.database import File
 from ..core.modules import load_modules, modules
 from ..core.projects import projects
 from ..core.sessions import sessions
@@ -27,10 +27,9 @@ class Shell:
     def __welcome(self) -> None:
         logo()
 
-        db = Database()
         log.info(
             "[magenta]You have [bold]%d[/] files in your [bold]%s[/] project[/]",
-            db.files.total(),
+            File.select().count(),
             projects.current.name,
         )
 
