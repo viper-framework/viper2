@@ -15,7 +15,6 @@ database_proxy = DatabaseProxy()
 
 
 class BaseModel(Model):
-    # pylint disable=too-few-public-methods
     class Meta:
         database = database_proxy
 

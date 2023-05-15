@@ -19,9 +19,6 @@ class FileObject:
         self.sha512 = ""
         self.crc32 = ""
         self.ssdeep = ""
-        self.tags = ""
-        self.parent = ""
-        self.children = ""
 
         if os.path.exists(self.path) and os.path.isfile(self.path):
             self.name = os.path.basename(self.path)

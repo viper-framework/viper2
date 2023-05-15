@@ -5,6 +5,7 @@ from .open import Open
 from .projects import Projects
 from .sessions import Sessions
 from .store import Store
+from .tags import Tags
 
 
 def load_commands() -> dict:
@@ -16,4 +17,5 @@ def load_commands() -> dict:
         Projects.cmd: {"class": Projects, "description": Projects.description},
         Sessions.cmd: {"class": Sessions, "description": Sessions.description},
         Store.cmd: {"class": Store, "description": Store.description},
+        Tags.cmd: {"class": Tags, "description": Tags.description},
     }

@@ -1,5 +1,6 @@
 import logging
 
+from viper2.core.database import File, Tag
 from viper2.core.modules import modules
 from viper2.core.sessions import sessions
 
@@ -17,12 +18,24 @@ class Info(Command):
             log.error("No open session! This command expects a file to be open")
             return
 
+        try:
+            tags = Tag.select().where(
+                Tag.file == File.get(File.sha256 == sessions.current.file.sha256)
+            )
+        except File.DoesNotExist:  # pylint: disable=no-member
+            tags_string = ""
+        else:
+            tags_list = []
+            for tag in tags:
+                tags_list.append(tag.name)
+            tags_string = ", ".join(tags_list)
+
         log.table(
             {
                 "columns": ["Key", "Value"],
                 "rows": [
                     ["Name", sessions.current.file.name],
-                    ["Tags", sessions.current.file.tags],
+                    ["Tags", tags_string],
                     ["Path", sessions.current.file.path],
                     ["Size", str(sessions.current.file.size)],
                     ["Magic", sessions.current.file.magic],
@@ -33,8 +46,6 @@ class Info(Command):
                     ["SHA512", sessions.current.file.sha512],
                     ["SSdeep", sessions.current.file.ssdeep],
                     ["CRC32", sessions.current.file.crc32],
-                    ["Parent", sessions.current.file.parent],
-                    ["Children", sessions.current.file.children],
                 ],
             },
         )

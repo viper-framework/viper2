@@ -80,4 +80,6 @@ class Find(Command):
             )
             counter += 1
 
-        log.table({"columns": ["#", "Date", "Name", "SHA1", "Magic"], "rows": rows})
+        log.table(
+            {"columns": ["#", "Date", "Name", "SHA1", "Magic", "Tags"], "rows": rows}
+        )
