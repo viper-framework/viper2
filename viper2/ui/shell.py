@@ -43,6 +43,11 @@ class Shell:
         if sessions.current:
             text.append(("ansigray", sessions.current.file.name))
 
+            try:
+                File.get(File.sha256 == sessions.current.file.sha256)
+            except File.DoesNotExist:  # pylint: disable=no-member
+                text.append(("ansimagenta", " [not stored]"))
+
         text.append(("ansicyan", "> "))
         return text
 
