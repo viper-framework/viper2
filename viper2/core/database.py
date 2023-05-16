@@ -35,12 +35,12 @@ class File(BaseModel):
 
 
 class Tag(BaseModel):
-    file = ForeignKeyField(File)
+    file = ForeignKeyField(File, backref="tags")
     name = CharField(unique=True)
 
 
 class Note(BaseModel):
-    file = ForeignKeyField(File)
+    file = ForeignKeyField(File, backref="notes")
     title = CharField()
     body = TextField()
 

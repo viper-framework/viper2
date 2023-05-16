@@ -25,10 +25,7 @@ class Info(Command):
         except File.DoesNotExist:  # pylint: disable=no-member
             tags_string = ""
         else:
-            tags_list = []
-            for tag in tags:
-                tags_list.append(tag.name)
-            tags_string = ", ".join(tags_list)
+            tags_string = ", ".join(tag.name for tag in tags)
 
         log.table(
             {

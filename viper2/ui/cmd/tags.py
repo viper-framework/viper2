@@ -1,5 +1,7 @@
 import logging
 
+import peewee
+
 from viper2.core.database import File, Tag
 from viper2.core.sessions import sessions
 
@@ -40,8 +42,11 @@ class Tags(Command):
             return
 
         for tag in tags:
-            tag = Tag(name=tag, file=file)
-            tag.save()
+            try:
+                new_tag = Tag(name=tag, file=file)
+                new_tag.save()
+            except peewee.IntegrityError:
+                log.error('The tag "%s" already exists', tag)
 
     def run(self) -> None:
         try:

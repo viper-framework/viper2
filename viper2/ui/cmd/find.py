@@ -1,6 +1,6 @@
 import logging
 
-from viper2.core.database import File
+from viper2.core.database import File, Tag
 from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
@@ -58,8 +58,11 @@ class Find(Command):
         elif self.args.key == "sha512":
             files = File.select().where(File.sha512 == self.args.value)
         elif self.args.key == "tag":
-            # TODO
-            files = []
+            files = (
+                File.select()
+                .join(Tag, on=(Tag.file == File.id))
+                .where(Tag.name.contains(self.args.value))
+            )
         elif self.args.key == "note":
             # TODO
             files = []
