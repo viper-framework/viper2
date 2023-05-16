@@ -60,7 +60,7 @@ class Find(Command):
         elif self.args.key == "tag":
             files = (
                 File.select()
-                .join(Tag, on=(Tag.file == File.id))
+                .join(Tag, on=Tag.file == File.id)
                 .where(Tag.name.contains(self.args.value))
             )
         elif self.args.key == "note":
