@@ -78,8 +78,9 @@ class Find(Command):
         rows = []
         counter = 1
         for file in files:
+            tags = ", ".join(tag.name for tag in file.tags)
             rows.append(
-                [str(counter), str(file.created_date), file.name, file.sha1, file.magic]
+                [str(counter), str(file.created_date), file.name, file.sha1, file.magic, tags]
             )
             counter += 1
 
