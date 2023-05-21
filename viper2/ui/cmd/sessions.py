@@ -22,12 +22,12 @@ class Sessions(Command):
         )
 
     def __list(self) -> None:
-        if not sessions.list():
+        if not sessions.all():
             log.info("There are no open sessions")
             return
 
         rows = []
-        for session in sessions.list():
+        for session in sessions.all():
             current = ""
             if session == sessions.current:
                 current = "Yes"
@@ -51,7 +51,7 @@ class Sessions(Command):
         )
 
     def __switch(self, identifier: int) -> None:
-        for session in sessions.list():
+        for session in sessions.all():
             if identifier == session.identifier:
                 sessions.switch(session)
                 return

@@ -38,7 +38,7 @@ class Sessions:
     def get_find(self) -> list:
         return self.__last_find
 
-    def list(self) -> list:
+    def all(self) -> list:
         return self.__sessions
 
     def close(self) -> None:
