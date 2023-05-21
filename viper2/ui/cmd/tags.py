@@ -41,7 +41,7 @@ class Tags(Command):
             )
             return
 
-        for tag in tags:
+        for tag in list(tags):
             try:
                 new_tag = Tag(name=tag, file=file)
                 new_tag.save()
