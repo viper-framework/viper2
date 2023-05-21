@@ -60,7 +60,7 @@ class Find(Command):
         elif self.args.key == "tag":
             files = (
                 File.select()
-                .join(Tag, on=Tag.file == File.id)
+                .join(Tag, on=Tag.file == File.id)  # pylint: disable=no-member
                 .where(Tag.name.contains(self.args.value))
             )
         elif self.args.key == "note":
