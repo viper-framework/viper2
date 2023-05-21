@@ -25,7 +25,7 @@ class Tags(Command):
 
     def list(self) -> None:
         tags = Tag.select(Tag.name).distinct(True)
-        for tag in tags:
+        for tag in list(tags):
             print(tag.name)
 
     def add(self, tags) -> None:
@@ -41,7 +41,7 @@ class Tags(Command):
             )
             return
 
-        for tag in list(tags):
+        for tag in tags:
             try:
                 new_tag = Tag(name=tag, file=file)
                 new_tag.save()
