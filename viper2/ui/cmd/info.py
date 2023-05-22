@@ -19,9 +19,8 @@ class Info(Command):
             return
 
         try:
-            tags = Tag.select().where(
-                Tag.file == File.get(File.sha256 == sessions.current.file.sha256)
-            )
+            file = File.get(File.sha256 == sessions.current.file.sha256)
+            tags = Tag.select().where(Tag.file == file)
         except File.DoesNotExist:  # pylint: disable=no-member
             tags_string = ""
         else:

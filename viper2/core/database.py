@@ -31,7 +31,7 @@ class File(BaseModel):
     sha512 = CharField()
     ssdeep = CharField()
     created_date = DateTimeField(default=datetime.datetime.now)
-    # parent = ForeignKeyField(File)
+    parent = ForeignKeyField("self", backref="children", null=True)
 
 
 class Tag(BaseModel):
