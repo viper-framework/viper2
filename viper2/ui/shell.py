@@ -28,7 +28,7 @@ class Shell:
         logo()
 
         log.info(
-            "[magenta]You have [bold]%d[/] files in your [bold]%s[/] project[/]",
+            "[magenta]You have [bold]%d[/] file/s in your [bold]%s[/] project[/]",
             File.select().count(),
             projects.current.name,
         )
