@@ -37,7 +37,8 @@ class Tags(Command):
             file = File.get(File.sha256 == sessions.current.file.sha256)
         except File.DoesNotExist:  # pylint: disable=no-member
             log.error(
-                'The currently open file is not stored in the database, use "store" command first'
+                "The currently open file is not stored in the database, "
+                'use "store" command first'
             )
             return
 

@@ -12,4 +12,4 @@ set -x
 ${PREFIX}autoflake --in-place --recursive --exclude venv ${SOURCE}
 ${PREFIX}isort --profile black ${SOURCE}
 ${PREFIX}black --exclude venv ${SOURCE}
-${PREFIX}pylint --rcfile=setup.cfg ${SOURCE}
+${PREFIX}ruff ${SOURCE}
