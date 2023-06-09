@@ -1,11 +1,11 @@
 import logging
 import shlex
 import subprocess
+from typing import List
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.shortcuts import clear as prompt_clear
-from rich.console import Console
 
 from ..core.database import File
 from ..core.modules import load_modules, modules
@@ -51,6 +51,13 @@ class Shell:
         text.append(("ansicyan", "> "))
         return text
 
+    def __expand_args(self, args: List[str]) -> List[str]:
+        for index, arg in enumerate(args):
+            if arg == "$file":
+                args[index] = sessions.current.file.path
+
+        return args
+
     def exit(self) -> None:
         log.info("Exiting...")
         self.__running = False
@@ -86,8 +93,7 @@ class Shell:
     def exec(self, cmd_name, cmd_args) -> None:
         with subprocess.Popen([cmd_name] + cmd_args, stdout=subprocess.PIPE) as proc:
             stdout, _ = proc.communicate()
-            console = Console()
-            console.print(stdout.decode())
+            print(stdout.decode())
 
     def run(self) -> None:
         self.__welcome()
@@ -115,7 +121,7 @@ class Shell:
 
             cmd_words = shlex.split(cmd_string)
             cmd_name = cmd_words[0].lower().strip()
-            cmd_args = cmd_words[1:]
+            cmd_args = self.__expand_args(cmd_words[1:])
 
             if cmd_name.startswith("!"):
                 self.exec(cmd_name[1:], cmd_args)
