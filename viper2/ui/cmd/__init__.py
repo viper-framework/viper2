@@ -1,3 +1,4 @@
+from .about import About
 from .children import Children
 from .close import Close
 from .export import Export
@@ -13,6 +14,7 @@ from .tags import Tags
 
 def load_commands() -> dict:
     return {
+        About.cmd: {"class": About, "description": About.description},
         Children.cmd: {"class": Children, "description": Children.description},
         Close.cmd: {"class": Close, "description": Close.description},
         Export.cmd: {"class": Export, "description": Export.description},
