@@ -1,5 +1,7 @@
 import logging
+from typing import cast
 
+from viper2.common.module import Module
 from viper2.core.database import File, Tag
 from viper2.core.modules import modules
 from viper2.core.sessions import sessions
@@ -48,7 +50,8 @@ class Info(Command):
 
         supported_modules = []
         for module_name, module_properties in modules.items():
-            if module_properties["class"].supports_file(sessions.current.file):
+            mod = cast(Module, module_properties["class"])
+            if mod.supports_file(sessions.current.file):
                 supported_modules.append(
                     [module_name, module_properties["description"]]
                 )

@@ -7,7 +7,7 @@ import shutil
 import sys
 import tempfile
 
-from pipreqs import pipreqs
+from pipreqs import pipreqs # type: ignore
 
 from ..common.module import Module
 

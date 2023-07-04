@@ -1,7 +1,7 @@
 import logging
 import shlex
 import subprocess
-from typing import List
+from typing import List, Tuple
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -33,7 +33,7 @@ class Shell:
             projects.current.name,
         )
 
-    def __prompt(self) -> str:
+    def __prompt(self) -> List[Tuple[str, str]]:
         text = []
         if not projects.current.is_default():
             text.append(("bold ansicyan", f"{projects.current.name} "))
