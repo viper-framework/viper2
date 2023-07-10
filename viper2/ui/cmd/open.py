@@ -44,7 +44,7 @@ class Open(Command):
             for idx, entry in enumerate(sessions.get_find(), start=1):
                 if idx == int(self.args.last):
                     sessions.new(
-                        Storage().get_file_path(projects.current.path, entry.sha256)
+                        Storage().get_file_path(projects.current.path, entry.sha256.__str__())
                     )
                     return
 

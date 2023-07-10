@@ -30,15 +30,15 @@ class Sessions:
         # TODO: However, this is not really the optimal place for this, as
         #       this class is intended only to keep track of currently open
         #       files. Find results are a little off-spec.
-        self.__last_find = []
+        self.__last_find: List[File] = []
 
-    def add_find(self, results: list) -> None:
+    def add_find(self, results: List[File]) -> None:
         self.__last_find = results
 
-    def get_find(self) -> list:
+    def get_find(self) -> List[File]:
         return self.__last_find
 
-    def all(self) -> list:
+    def all(self) -> List[Session]:
         return self.__sessions
 
     def close(self) -> None:
