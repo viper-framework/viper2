@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 
+from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.core.sessions import sessions
 
 from .command import Command
@@ -23,7 +24,7 @@ class Export(Command):
         super().run()
 
         if not sessions.current:
-            log.error("No open session! This command expects a file to be open")
+            log.error(ERROR_NO_OPEN_FILE)
             return
 
         if not self.args.dst:

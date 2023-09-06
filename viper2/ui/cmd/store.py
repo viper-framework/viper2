@@ -1,5 +1,6 @@
 import logging
 
+from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.common.file import FileObject
 from viper2.core.database import File
 from viper2.core.projects import projects
@@ -46,7 +47,7 @@ class Store(Command):
             return
 
         if not sessions.current:
-            log.error("This command expects a session to a file to be open")
+            log.error(ERROR_NO_OPEN_FILE)
             return
 
         self.add_file(sessions.current.file)

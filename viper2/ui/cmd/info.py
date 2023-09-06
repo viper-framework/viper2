@@ -1,6 +1,7 @@
 import logging
 from typing import cast
 
+from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.common.module import Module
 from viper2.core.database import File, Tag
 from viper2.core.modules import modules
@@ -17,7 +18,7 @@ class Info(Command):
 
     def run(self) -> None:
         if not sessions.current:
-            log.error("No open session! This command expects a file to be open")
+            log.error(ERROR_NO_OPEN_FILE)
             return
 
         try:

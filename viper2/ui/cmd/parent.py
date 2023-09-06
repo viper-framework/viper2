@@ -1,5 +1,6 @@
 import logging
 
+from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.core.database import File
 from viper2.core.sessions import sessions
 
@@ -25,7 +26,7 @@ class Parent(Command):
         super().run()
 
         if not sessions.current:
-            log.error("This command expects a session to a file to be open")
+            log.error(ERROR_NO_OPEN_FILE)
             return
 
         try:

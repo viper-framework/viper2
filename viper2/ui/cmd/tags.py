@@ -2,6 +2,7 @@ import logging
 
 import peewee
 
+from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.core.database import File, Tag
 from viper2.core.sessions import sessions
 
@@ -30,7 +31,7 @@ class Tags(Command):
 
     def add(self, tags) -> None:
         if not sessions.current:
-            log.error("This command expects a session to a file to be open")
+            log.error(ERROR_NO_OPEN_FILE)
             return
 
         try:
