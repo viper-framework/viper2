@@ -38,33 +38,34 @@ class Find(Command):
         except CommandRunError:
             return
 
-        if self.args.key == "all":
-            files = File.select().order_by(File.created_date)
-        elif self.args.key == "name":
-            files = File.select().where(File.name.contains(self.args.value))
-        elif self.args.key == "magic":
-            files = File.select().where(File.magic.contains(self.args.value))
-        elif self.args.key == "mime":
-            files = File.select().where(File.mime.contains(self.args.value))
-        elif self.args.key == "md5":
-            files = File.select().where(File.md5 == self.args.value)
-        elif self.args.key == "sha1":
-            files = File.select().where(File.sha1 == self.args.value)
-        elif self.args.key == "sha256":
-            files = File.select().where(File.sha256 == self.args.value)
-        elif self.args.key == "sha512":
-            files = File.select().where(File.sha512 == self.args.value)
-        elif self.args.key == "tag":
-            files = (
-                File.select()
-                .join(Tag, on=Tag.file == File.id)  # pylint: disable=no-member
-                .where(Tag.name.contains(self.args.value))
-            )
-        elif self.args.key == "note":
-            # TODO
-            files = []
-        elif self.args.key == "ssdeep":
-            files = File.select().where(File.ssdeep.contains(self.args.value))
+        match self.args.key:
+            case "all":
+                files = File.select().order_by(File.created_date)
+            case "name":
+                files = File.select().where(File.name.contains(self.args.value))
+            case "magic":
+                files = File.select().where(File.magic.contains(self.args.value))
+            case "mime":
+                files = File.select().where(File.mime.contains(self.args.value))
+            case "md5":
+                files = File.select().where(File.md5 == self.args.value)
+            case "sha1":
+                files = File.select().where(File.sha1 == self.args.value)
+            case "sha256":
+                files = File.select().where(File.sha256 == self.args.value)
+            case "sha512":
+                files = File.select().where(File.sha512 == self.args.value)
+            case "tag":
+                files = (
+                    File.select()
+                    .join(Tag, on=Tag.file == File.id)  # pylint: disable=no-member
+                    .where(Tag.name.contains(self.args.value))
+                )
+            case "note":
+                # TODO
+                files = []
+            case "ssdeep":
+                files = File.select().where(File.ssdeep.contains(self.args.value))
 
         if len(files) == 0:
             printer.info("No matching results")
