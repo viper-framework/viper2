@@ -1,5 +1,4 @@
-import logging
-
+from viper2 import printer
 from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.common.file import FileObject
 from viper2.core.database import File
@@ -8,8 +7,6 @@ from viper2.core.sessions import sessions
 from viper2.core.storage import Storage
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Store(Command):
@@ -33,12 +30,12 @@ class Store(Command):
                 ssdeep=file_object.ssdeep,
             )
             file.save()
-            log.success("Stored file details into database")
+            printer.success("Stored file details into database")
 
         storage = Storage()
         if not storage.get_file_path(projects.current.path, file_object.sha256):
             new_path = storage.add_file(projects.current.path, file_object)
-            log.success("Stored file %s to %s", file_object.name, new_path)
+            printer.success("Stored file %s to %s", file_object.name, new_path)
 
     def run(self) -> None:
         try:
@@ -47,7 +44,7 @@ class Store(Command):
             return
 
         if not sessions.current:
-            log.error(ERROR_NO_OPEN_FILE)
+            printer.error(ERROR_NO_OPEN_FILE)
             return
 
         self.add_file(sessions.current.file)

@@ -1,13 +1,11 @@
-import logging
 import os
 
+from viper2 import printer
 from viper2.core.projects import projects
 from viper2.core.sessions import sessions
 from viper2.core.storage import Storage
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Open(Command):
@@ -34,7 +32,7 @@ class Open(Command):
 
         if self.args.file:
             if not os.path.exists(self.args.file):
-                log.error(
+                printer.error(
                     "The specified file at path %s does not exist", self.args.file
                 )
                 return
@@ -45,11 +43,11 @@ class Open(Command):
                 if idx == int(self.args.last):
                     sessions.new(
                         Storage().get_file_path(
-                            projects.current.path, entry.sha256.__str__()
+                            projects.current.path, str(entry.sha256)
                         )
                     )
                     return
 
-            log.error("Did not find a last find entry with the provided #")
+            printer.error("Did not find a last find entry with the provided #")
         else:
             self.args_parser.print_usage()

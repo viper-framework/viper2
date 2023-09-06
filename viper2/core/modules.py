@@ -1,6 +1,5 @@
 import importlib
 import inspect
-import logging
 import os
 import pkgutil
 import shutil
@@ -9,9 +8,10 @@ import tempfile
 
 from pipreqs import pipreqs  # type: ignore
 
+from viper2 import printer
+
 from ..common.module import Module
 
-log = logging.getLogger("viper")
 modules = {}
 
 
@@ -44,7 +44,7 @@ def load_modules(modules_path: str) -> None:
         return
 
     if not os.path.exists(modules_path):
-        log.error("The modules directory does not exist at path: %s", modules_path)
+        printer.error("The modules directory does not exist at path: %s", modules_path)
         return
 
     sys.path.insert(0, modules_path)
@@ -58,20 +58,22 @@ def load_modules(modules_path: str) -> None:
         for dep in dependencies:
             if not have_dependency(dep):
                 can_import = False
-                log.error(
+                printer.error(
                     "Module at path %s requires the following missing library: '%s'",
                     module_path,
                     dep,
                 )
 
         if not can_import:
-            log.error("Cannot proceed importing module '%s'", module_name)
+            printer.error("Cannot proceed importing module '%s'", module_name)
             continue
 
         try:
             module = importlib.import_module(module_name)
         except ImportError as exc:
-            log.error("Failed to import module with name '%s': %s", module_name, exc)
+            printer.error(
+                "Failed to import module with name '%s': %s", module_name, exc
+            )
             continue
 
         for member_name, member_object in inspect.getmembers(module):
@@ -80,17 +82,17 @@ def load_modules(modules_path: str) -> None:
 
             if issubclass(member_object, Module) and member_object is not Module:
                 if not hasattr(member_object, "cmd"):
-                    log.error(
+                    printer.error(
                         "The module %s does not have a `cmd` attribute, cannot load",
                         member_name,
                     )
                     continue
 
-                log.debug(
-                    "Loaded module %s (%s)",
-                    member_object.cmd,
-                    member_object.description,
-                )
+                # printer.debug(
+                #     "Loaded module %s (%s)",
+                #     member_object.cmd,
+                #     member_object.description,
+                # )
                 modules[member_object.cmd] = {
                     "class": member_object,
                     "description": member_object.description,

@@ -1,14 +1,11 @@
-import logging
-
 import peewee
 
+from viper2 import printer
 from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.core.database import File, Tag
 from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Tags(Command):
@@ -31,13 +28,13 @@ class Tags(Command):
 
     def add(self, tags) -> None:
         if not sessions.current:
-            log.error(ERROR_NO_OPEN_FILE)
+            printer.error(ERROR_NO_OPEN_FILE)
             return
 
         try:
             file = File.get(File.sha256 == sessions.current.file.sha256)
         except File.DoesNotExist:  # pylint: disable=no-member
-            log.error(
+            printer.error(
                 "The currently open file is not stored in the database, "
                 'use "store" command first'
             )
@@ -48,7 +45,7 @@ class Tags(Command):
                 new_tag = Tag(name=tag, file=file)
                 new_tag.save()
             except peewee.IntegrityError:
-                log.error('The tag "%s" already exists', tag)
+                printer.error('The tag "%s" already exists', tag)
 
     def run(self) -> None:
         try:

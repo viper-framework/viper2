@@ -1,11 +1,10 @@
-import logging
 import os
 
 from platformdirs import user_data_dir
 
-from ..common.file import FileObject
+from viper2 import printer
 
-log = logging.getLogger("viper")
+from ..common.file import FileObject
 
 
 class Storage:
@@ -16,7 +15,7 @@ class Storage:
     def add_file(self, project_path: str, file_object: FileObject) -> str:
         sha256 = file_object.sha256
         if not sha256:
-            log.error("The file does not have a valid sha256 hash")
+            printer.error("The file does not have a valid sha256 hash")
             return ""
 
         file_dir = os.path.join(
@@ -29,14 +28,14 @@ class Storage:
         file_path = os.path.join(file_dir, sha256)
 
         if os.path.exists(file_path):
-            log.warning("The file exists already, skip")
+            printer.warning("The file exists already, skip")
             return file_path
 
         with open(file_path, "wb") as handle:
             for chunk in file_object.get_chunks():
                 handle.write(chunk)
 
-        log.success("Successfully stored file in repository")
+        printer.success("Successfully stored file in repository")
         return file_path
 
     def get_file_path(self, project_path: str, sha256: str) -> str:

@@ -1,4 +1,3 @@
-import logging
 import shlex
 import subprocess
 from typing import List, Tuple
@@ -7,14 +6,14 @@ from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.shortcuts import clear as prompt_clear
 
+from viper2 import printer
+
 from ..core.database import File
 from ..core.modules import load_modules, modules
 from ..core.projects import projects
 from ..core.sessions import sessions
 from .cmd import load_commands
 from .logo import logo
-
-log = logging.getLogger("viper")
 
 
 class Shell:
@@ -27,7 +26,7 @@ class Shell:
     def __welcome(self) -> None:
         logo()
 
-        log.info(
+        printer.info(
             "[magenta]You have [bold]%d[/] file/s in your [bold]%s[/] project[/]",
             File.select().count(),
             projects.current.name,
@@ -53,13 +52,13 @@ class Shell:
 
     def __expand_args(self, args: List[str]) -> List[str]:
         for index, arg in enumerate(args):
-            if arg == "$file":
+            if arg == "$file" and sessions.current:
                 args[index] = sessions.current.file.path
 
         return args
 
     def exit(self) -> None:
-        log.info("Exiting...")
+        printer.info("Exiting...")
         self.__running = False
 
     def help(self) -> None:
@@ -71,21 +70,21 @@ class Shell:
         for cmd_name, cmd_properties in self.__commands.items():
             rows.append([cmd_name, cmd_properties["description"]])
 
-        log.info("[bold]Commands:[/]")
-        log.table({"columns": ["Command", "Description"], "rows": rows})
+        printer.info("[bold]Commands:[/]")
+        printer.table(columns=["Command", "Description"], rows=rows)
 
         print("")
 
         if len(self.__modules) == 0:
-            log.info("No modules available")
+            printer.info("No modules available")
             return
 
         rows = []
         for module_name, module_properties in self.__modules.items():
             rows.append([module_name, module_properties["description"]])
 
-        log.info("[bold]Modules:[/]")
-        log.table({"columns": ["Module", "Description"], "rows": rows})
+        printer.info("[bold]Modules:[/]")
+        printer.table(columns=["Module", "Description"], rows=rows)
 
     def clear(self) -> None:
         prompt_clear()
@@ -151,4 +150,4 @@ class Shell:
                 mod.run()
                 continue
 
-            log.error('No command or module found for "%s"', cmd_name)
+            printer.error('No command or module found for "%s"', cmd_name)

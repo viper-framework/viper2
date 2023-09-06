@@ -1,12 +1,9 @@
-import logging
-
+from viper2 import printer
 from viper2.common.errors import ERROR_NO_OPEN_FILE
 from viper2.core.database import File
 from viper2.core.sessions import sessions
 
 from .command import Command
-
-log = logging.getLogger("viper")
 
 
 class Children(Command):
@@ -15,13 +12,13 @@ class Children(Command):
 
     def run(self) -> None:
         if not sessions.current:
-            log.error(ERROR_NO_OPEN_FILE)
+            printer.error(ERROR_NO_OPEN_FILE)
             return
 
         try:
             file = File.get(File.sha256 == sessions.current.file.sha256)
         except File.DoesNotExist:  # pylint: disable=no-member
-            log.error("The currently open file is not stored")
+            printer.error("The currently open file is not stored")
             return
 
         rows = []
@@ -37,7 +34,7 @@ class Children(Command):
             )
 
         if len(rows) == 0:
-            log.info("The currently open file does not have children")
+            printer.info("The currently open file does not have children")
             return
 
-        log.table({"columns": ["Date", "Name", "SHA1", "Magic", "Tags"], "rows": rows})
+        printer.table(columns=["Date", "Name", "SHA1", "Magic", "Tags"], rows=rows)

@@ -1,16 +1,14 @@
-import logging
 import os
 import shutil
 import time
 
 from prompt_toolkit.shortcuts import confirm
 
+from viper2 import printer
 from viper2.core.projects import projects
 from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Projects(Command):
@@ -52,7 +50,7 @@ class Projects(Command):
         if self.args.list:
             projects_list = projects.list()
             if len(projects_list) == 0:
-                log.info("There are no projects currently")
+                printer.info("There are no projects currently")
                 return
 
             rows = []
@@ -61,13 +59,13 @@ class Projects(Command):
                 project_ct_date = time.ctime(os.path.getctime(project_path))
                 rows.append([project_name, project_ct_date])
 
-            log.table({"columns": ["Project Name", "Creation Date"], "rows": rows})
+            printer.table(columns=["Project Name", "Creation Date"], rows=rows)
         elif self.args.switch:
             # When we switch project, we reset sessions so that any previously
             # open sessions are closed and removed.
             sessions.reset()
             projects.open(self.args.switch)
-            log.success('Switched to project with name "%s"', self.args.switch)
+            printer.success('Switched to project with name "%s"', self.args.switch)
         elif self.args.close:
             # Similarly to switch, if we close the current project, we should
             # also close all active sessions.
@@ -86,9 +84,11 @@ class Projects(Command):
             for project_path in projects.list():
                 if os.path.basename(project_path) == self.args.delete:
                     shutil.rmtree(project_path)
-                    log.success("Successfully deleted project at path %s", project_path)
+                    printer.success(
+                        "Successfully deleted project at path %s", project_path
+                    )
                     return
 
-            log.error('Could not find a project with name "%s"', self.args.delete)
+            printer.error('Could not find a project with name "%s"', self.args.delete)
         else:
             self.args_parser.print_usage()

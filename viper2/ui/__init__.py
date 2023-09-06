@@ -1,17 +1,13 @@
 import argparse
-import logging
 import shlex
+
+from viper2 import printer
 
 from ..core.modules import load_modules, modules
 from ..core.projects import projects
 from ..core.sessions import sessions
 from .cmd import load_commands
-from .logger import init_logging
 from .shell import Shell
-
-init_logging()
-
-log = logging.getLogger("viper")
 
 
 def run(cmd: str, modules_path: str) -> None:
@@ -30,7 +26,7 @@ def run(cmd: str, modules_path: str) -> None:
         mod.add_args(*cmd_args)
         mod.run()
     else:
-        log.error('No module or command found for "%s"', cmd_name)
+        printer.error('No module or command found for "%s"', cmd_name)
 
 
 def main() -> None:

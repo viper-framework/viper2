@@ -1,11 +1,8 @@
-import logging
-
+from viper2 import printer
 from viper2.core.database import File, Tag
 from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Find(Command):
@@ -70,7 +67,7 @@ class Find(Command):
             files = File.select().where(File.ssdeep.contains(self.args.value))
 
         if len(files) == 0:
-            log.info("No matching results")
+            printer.info("No matching results")
             return
 
         sessions.add_find(files)
@@ -91,6 +88,4 @@ class Find(Command):
             )
             counter += 1
 
-        log.table(
-            {"columns": ["#", "Date", "Name", "SHA1", "Magic", "Tags"], "rows": rows}
-        )
+        printer.table(columns=["#", "Date", "Name", "SHA1", "Magic", "Tags"], rows=rows)

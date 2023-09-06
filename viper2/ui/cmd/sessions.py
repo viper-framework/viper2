@@ -1,10 +1,7 @@
-import logging
-
+from viper2 import printer
 from viper2.core.sessions import sessions
 
 from .command import Command, CommandRunError
-
-log = logging.getLogger("viper")
 
 
 class Sessions(Command):
@@ -23,7 +20,7 @@ class Sessions(Command):
 
     def __list(self) -> None:
         if not sessions.all():
-            log.info("There are no open sessions")
+            printer.info("There are no open sessions")
             return
 
         rows = []
@@ -42,13 +39,8 @@ class Sessions(Command):
                 ]
             )
 
-        log.info("[bold]Open sessions:[/]")
-        log.table(
-            {
-                "columns": ["#", "Name", "SHA1", "Created At", "Current"],
-                "rows": rows,
-            },
-        )
+        printer.info("[bold]Open sessions:[/]")
+        printer.table(columns=["#", "Name", "SHA1", "Created At", "Current"], rows=rows)
 
     def __switch(self, identifier: int) -> None:
         for session in sessions.all():
@@ -56,7 +48,7 @@ class Sessions(Command):
                 sessions.switch(session)
                 return
 
-        log.error("The specified session ID doesn't seem to exist")
+        printer.error("The specified session ID doesn't seem to exist")
 
     def run(self) -> None:
         try:

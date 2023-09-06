@@ -1,13 +1,12 @@
 import datetime
-import logging
 import os
 import time
 from typing import List, Optional
 
+from viper2 import printer
+
 from ..common.file import FileObject
 from .database import File
-
-log = logging.getLogger("viper")
 
 
 # pylint: disable=too-few-public-methods
@@ -55,14 +54,14 @@ class Sessions:
         file_object = FileObject(file_path)
         for session in self.__sessions:
             if session.file and session.file.path == file_path:
-                log.error(
+                printer.error(
                     "There is already a session open with file to path %s",
                     session.file.path,
                 )
                 return
 
         if not os.path.exists(file_object.path):
-            log.error("File does not exist at path %s", file_object.path)
+            printer.error("File does not exist at path %s", file_object.path)
             return
 
         session = Session()
@@ -79,7 +78,7 @@ class Sessions:
         self.__sessions.append(session)
         self.current = session
 
-        log.success(
+        printer.success(
             "New session opened to file %s with ID %d",
             session.file.path,
             session.identifier,
