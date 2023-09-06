@@ -1,3 +1,5 @@
+from typing import Any
+
 from rich.console import Console
 from rich.table import Table
 
@@ -6,16 +8,16 @@ class Printer:
     def __init__(self):
         self.__console = Console()
 
-    def info(self, msg: str, *args) -> None:
+    def info(self, msg: str, *args: Any) -> None:
         self.__console.print(msg % args)
 
-    def warning(self, msg: str, *args) -> None:
+    def warning(self, msg: str, *args: Any) -> None:
         self.__console.print(f"[yellow]WARNING: {msg % args}[/]")
 
-    def error(self, msg: str, *args) -> None:
+    def error(self, msg: str, *args: Any) -> None:
         self.__console.print(f"[red]ERROR: {msg % args}[/]")
 
-    def success(self, msg: str, *args) -> None:
+    def success(self, msg: str, *args: Any) -> None:
         self.__console.print(f"[green]{msg % args}[/]")
 
     def table(self, columns, rows) -> None:
